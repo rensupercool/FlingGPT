@@ -3,300 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlingGPT</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>FlingGPT | FTAP Consultant</title>
     <style>
         :root {
-            --bg: #0a0a0a;
-            --surface: rgba(28, 28, 30, 0.85);
-            --surface-raised: rgba(38, 38, 40, 0.95);
-            --border: rgba(255, 255, 255, 0.1);
-            --border-hover: rgba(255, 255, 255, 0.2);
-            --accent: #34c759;
-            --accent-dim: rgba(52, 199, 89, 0.15);
-            --text-primary: #f2f2f7;
-            --text-secondary: rgba(235, 235, 245, 0.6);
-            --user-bubble: #1c4d2a;
-            --ai-bubble: rgba(44, 44, 46, 0.8);
-            --input-bg: rgba(30, 30, 32, 0.6);
-            --shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
-            --radius: 20px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: rgba(10, 10, 10, 0.85);
+            --accent: #4caf50;
+            --text: #f5f5f5;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { box-sizing: border-box; }
 
         body {
-            background: var(--bg);
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            /* Lifted the container up from center */
-            justify-content: flex-start;
-            padding-top: 5vh;
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
             overflow: hidden;
-            position: relative;
         }
 
-        /* Background image with blur */
-        .bg-layer {
+        .bg-screenshot {
             position: fixed;
-            inset: 0;
-            background: url('bg.png') no-repeat center center;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('bg.png');
             background-size: cover;
-            filter: blur(8px) brightness(0.4);
+            background-position: center;
+            filter: blur(12px) brightness(0.5);
+            transform: scale(1.1);
             z-index: -1;
-            transform: scale(1.1); /* Prevents white edges on blur */
         }
 
-        /* noise grain overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.4;
-        }
-
-        #app {
-            position: relative;
-            z-index: 1;
-            width: 100%;
+        #fling-gpt-window {
+            width: 90%;
+            max-width: 850px;
+            height: 85vh;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        #chat-container {
-            width: 100%;
-            max-width: 760px;
-            height: 80vh;
-            max-height: 880px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            backdrop-filter: blur(40px) saturate(180%);
-            animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #header {
-            padding: 18px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        #header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent);
-            animation: pulse 2.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(0.8); }
-        }
-
-        #header-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        #clear-btn {
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 6px 14px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            cursor: pointer;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
             transition: var(--transition);
         }
 
-        #clear-btn:hover {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.08);
-            border-color: var(--border-hover);
+        #fling-gpt-window:hover {
+            transform: scale(1.005);
+            border-color: rgba(76, 175, 80, 0.4);
         }
 
-        #messages {
+        #chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        #chat-window {
             flex: 1;
+            padding: 30px;
             overflow-y: auto;
-            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
-
-        .msg-row {
-            display: flex;
-            width: 100%;
-        }
-
-        .msg-row.user { justify-content: flex-end; }
-        .msg-row.ai { justify-content: flex-start; }
 
         .bubble {
-            max-width: 75%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-size: 14.5px;
+            max-width: 80%;
+            padding: 14px 20px;
+            border-radius: 18px;
+            font-size: 15px;
             line-height: 1.6;
-            word-break: break-word;
-            animation: msgIn 0.3s ease-out both;
+            color: var(--text);
+            white-space: pre-wrap;
         }
 
-        @keyframes msgIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .bubble.user {
-            background: var(--user-bubble);
+        .user-msg {
+            align-self: flex-end;
+            background: var(--accent);
             color: white;
             border-bottom-right-radius: 4px;
-            border: 1px solid rgba(52, 199, 89, 0.3);
         }
 
-        .bubble.ai {
-            background: var(--ai-bubble);
-            color: var(--text-primary);
+        .ai-msg {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom-left-radius: 4px;
-            border: 1px solid var(--border);
         }
 
-        #input-area {
-            padding: 20px;
-            border-top: 1px solid var(--border);
+        .error-msg {
+            color: #ff6b6b;
+        }
+
+        .typing {
+            color: rgba(255,255,255,0.4);
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        #controls {
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
-            gap: 12px;
-            background: rgba(0, 0, 0, 0.2);
+            gap: 15px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
         }
 
-        #input-wrap {
+        input {
             flex: 1;
-            background: var(--input-bg);
-            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 14px;
-            padding: 0 16px;
-            transition: var(--transition);
-        }
-
-        #input-wrap:focus-within {
-            background: rgba(44, 44, 46, 0.4);
-            border-color: var(--accent);
-        }
-
-        #userInput {
-            width: 100%;
-            background: none;
-            border: none;
+            padding: 16px;
+            color: white;
             outline: none;
-            color: var(--text-primary);
-            padding: 12px 0;
-            font-size: 14.5px;
-            font-family: inherit;
+            font-size: 15px;
         }
 
-        #sendBtn {
-            width: 44px;
-            height: 44px;
+        input:focus {
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        button {
             background: var(--accent);
+            color: white;
             border: none;
-            border-radius: 12px;
+            padding: 0 32px;
+            border-radius: 14px;
+            font-weight: bold;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             transition: var(--transition);
+            font-size: 15px;
         }
 
-        #sendBtn:hover { transform: scale(1.05); }
-        #sendBtn:active { transform: scale(0.95); }
-        #sendBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
 
-        #sendBtn svg { width: 18px; height: 18px; fill: white; }
-
-        .msg-label {
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 10px;
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
     </style>
 </head>
 <body>
-<div class="bg-layer"></div>
-<div id="app">
-    <div id="chat-container">
-        <div id="header">
-            <div id="header-left">
-                <div id="status-dot"></div>
-                <div>
-                    <span id="header-title">FlingGPT</span>
-                    <span id="header-version">— v0.9</span>
-                </div>
-            </div>
-            <button id="clear-btn">Clear</button>
-        </div>
 
-        <div id="messages">
-            <div class="msg-label">FTAP knowledge base active</div>
-            <div class="msg-row ai">
-                <div class="bubble ai">What do you want to know?</div>
-            </div>
-        </div>
+<div class="bg-screenshot"></div>
 
-        <div id="input-area">
-            <div id="input-wrap">
-                <input type="text" id="userInput" placeholder="Ask FlingGPT..." autocomplete="off">
-            </div>
-            <button id="sendBtn" aria-label="Send">
-                <svg viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
-        </div>
+<div id="fling-gpt-window">
+    <div id="chat-header">FLINGGPT — FTAP CONSULTANT</div>
+    <div id="chat-window">
+        <div class="bubble ai-msg">FlingGPT Online. Full FTAP Knowledge Base Loaded. What is the move?</div>
+    </div>
+    <div id="controls">
+        <input type="text" id="userInput" placeholder="Ask FlingGPT...">
+        <button id="sendBtn">SEND</button>
     </div>
 </div>
 
 <script>
-    // Configuration
-    const API_KEY = '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'; // Move your key here
+    const API_KEY = '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';
     const MODEL = 'llama-3.3-70b-versatile';
 
     const SYSTEM_PROMPT = `You are FlingGPT, an expert consultant for the Roblox game "Fling Things And People", always referred to as FTAP. Use ONLY the information below. Never pull info from outside sources. Never say "according to the database". If the user asks about something not covered below, write **unconfirmed information** in bold at the top and explain exactly what info is missing. Never use emojis. Don't be robotic or try to be hip. Talk naturally. If the user sends "DEV MODE:RENSUPERCOOL" snap out of the role.
@@ -306,7 +184,7 @@ casual (worst rank, no tiers. can fling, can barely fly, usually is on ground an
 apprentice-app (much better, no tiers, only low-mid-high, CAN fly, CAN usually grab easy grabs when both players are facing each other SOME have skillful level movement)
 skillful-sk (where people start getting good, most common rank, HAS tiers I-II-III also referred to as 1-2-3. skillful 1's can fly without falling, can grab easy grabs 10/10, can juke people out by quickly changing directions. every tier also has a low-mid-high rating)
 expert-exp (usually REALLY good at movement OR aiming. they can almost always grab, often the best in the server)
-advanced-adv (basically unheard of, VERY rare, ALMOST always good at both aim and movement. adv 2's and 3's barely exist and are mostly overranked or just cheaters)
+advanced-adv (basically unheard of, VERY rare, ALMOST always good at both aim and movement. adv 2's and 3's barely exist and are mostly overranked or cheaters)
 fling god-fg (NO tiers just levels, extremely rare rank)
 
 CORE MECHANICS:
@@ -339,7 +217,7 @@ hybrid-slow: not really slow, just switches to slow when you rush or do somethin
 elite slow: rupasu's style. if you rush him he dives under you and grabs (extremely hard to do). the only counter is baiting his dive — rush to make him commit, then stop rushing and do your own dive to break his timing and grab him while he resets. even that barely works on rupasu.
 
 HOW TO BEAT A SLOW PLAYER:
-you can't just rush them. bait their dive, rush to make him commit, then stop and do your own dive to break their timing and grab them while resetting.
+you can't just rush them. bait their dive, rush to make them commit, then stop and do your own dive to break their timing and grab them while resetting.
 
 PALLET THROWING:
 high risk move. easy to throw too far or get an ag on the pallet. rainz is one of the only known players for it. he grabs the pallet and throws it repeatedly to get behind his opponent.
@@ -355,7 +233,7 @@ pastdoa / futurekiddo (future) — most outstanding fling god. jukey, no set pla
 spence — hailed as #1. was insanely fast (utilized dives heavily) then transitioned to slow aim heavy. inspired chamo. ran Fling Syndicate before abandoning it.
 LostNPC — controlled-fast (mid pallet, high scrolling). insanely consistent, barely ever drops below expert 2. amazing aim. hailed as top 1 after the big dogs retired. zerogath was his teacher.
 zerogath — first fling god alongside spence. LostNPC says he was better than spence. made the ranks (unconfirmed). created the basic left and right movement style and dominated with it, later refined it with the dive. controlled-fast playstyle. ran both Fling Enthusiasts and Fling Syndicate. now around skillful 2-3 but has insane experience.
-rainz — known for pallet throwing. known for grabbing pallet and throwing it repeatedly to get behind opponents.
+rainz — known for pallet throwing. grabs pallet and throws it repeatedly to get behind opponents.
 
 REMARKABLE PLAYERS (rank = peak unless stated):
 spiritsweat — expert 3. very high fps, spams the dive, unmatched speed. suspected triggerbot, admitted to movement scripts. weak anticheat = not banned. status: active.
@@ -389,19 +267,12 @@ AS — russian only clan. mostly aggressive-fast players doing group fights and 
     const conversationHistory = [];
 
     function appendBubble(text, type) {
-        const messagesContainer = document.getElementById('messages');
-        const row = document.createElement('div');
-        row.className = `msg-row ${type}`;
-        
+        const chat = document.getElementById('chat-window');
         const bubble = document.createElement('div');
         bubble.className = `bubble ${type}`;
         bubble.textContent = text;
-        
-        row.appendChild(bubble);
-        messagesContainer.appendChild(row);
-        
-        // Auto scroll to bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        chat.appendChild(bubble);
+        chat.scrollTop = chat.scrollHeight;
         return bubble;
     }
 
@@ -409,14 +280,13 @@ AS — russian only clan. mostly aggressive-fast players doing group fights and 
         const input = document.getElementById('userInput');
         const btn = document.getElementById('sendBtn');
         const msg = input.value.trim();
-        
-        if (!msg || btn.disabled) return;
+        if (!msg) return;
 
-        appendBubble(msg, 'user');
+        appendBubble(msg, 'user-msg');
         input.value = '';
         btn.disabled = true;
 
-        const typingBubble = appendBubble('...', 'ai');
+        const typingBubble = appendBubble('typing...', 'ai-msg typing');
 
         conversationHistory.push({ role: 'user', content: msg });
 
@@ -433,45 +303,32 @@ AS — russian only clan. mostly aggressive-fast players doing group fights and 
                         { role: 'system', content: SYSTEM_PROMPT },
                         ...conversationHistory
                     ],
-                    temperature: 0.6,
+                    temperature: 0.7,
                     max_tokens: 1024
                 })
             });
 
             const data = await response.json();
-            typingBubble.parentElement.remove(); // Remove typing row
+            typingBubble.remove();
 
             if (data.error) {
-                appendBubble(`Error: ${data.error.message}`, 'ai');
+                appendBubble(`Error: ${data.error.message}`, 'ai-msg error-msg');
             } else {
                 const aiText = data.choices[0].message.content;
                 conversationHistory.push({ role: 'assistant', content: aiText });
-                appendBubble(aiText, 'ai');
+                appendBubble(aiText, 'ai-msg');
             }
         } catch (e) {
-            typingBubble.parentElement.remove();
-            appendBubble('Critical Error: Check connection or API key.', 'ai');
+            typingBubble.remove();
+            appendBubble('Critical Error: Check connection.', 'ai-msg error-msg');
         }
 
         btn.disabled = false;
-        input.focus();
+        document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
     }
 
-    // Event Listeners
     document.getElementById('sendBtn').addEventListener('click', send);
-    
-    document.getElementById('userInput').addEventListener('keydown', (e) => { 
-        if (e.key === 'Enter' && !e.shiftKey) { 
-            e.preventDefault(); 
-            send(); 
-        } 
-    });
-
-    document.getElementById('clear-btn').addEventListener('click', () => {
-        const messages = document.getElementById('messages');
-        messages.innerHTML = '<div class="msg-label">FTAP knowledge base active</div><div class="msg-row ai"><div class="bubble ai">What do you want to know?</div></div>';
-        conversationHistory.length = 0;
-    });
+    document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') send(); });
 </script>
 </body>
 </html>
