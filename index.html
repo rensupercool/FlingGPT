@@ -1,175 +1,352 @@
+html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlingGPT | FTAP Consultant</title>
+    <title>FlingGPT</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(10, 10, 10, 0.85);
-            --accent: #4caf50;
-            --text: #f5f5f5;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg: #0a0a0a;
+            --surface: rgba(28, 28, 30, 0.92);
+            --surface-raised: rgba(38, 38, 40, 0.95);
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.13);
+            --accent: #34c759;
+            --accent-dim: rgba(52, 199, 89, 0.15);
+            --text-primary: #f2f2f7;
+            --text-secondary: rgba(235, 235, 245, 0.45);
+            --user-bubble: #1c4d2a;
+            --ai-bubble: rgba(44, 44, 46, 0.9);
+            --input-bg: rgba(44, 44, 46, 0.7);
+            --shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
+            --radius: 20px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; }
-
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg);
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #000;
+            justify-content: center;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow: hidden;
         }
 
-        .bg-screenshot {
+        /* subtle noise grain overlay */
+        body::before {
+            content: '';
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image: url('bg.png');
-            background-size: cover;
-            background-position: center;
-            filter: blur(12px) brightness(0.5);
-            transform: scale(1.1);
-            z-index: -1;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
         }
 
-        #fling-gpt-window {
-            width: 90%;
-            max-width: 850px;
-            height: 85vh;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+        /* soft glow in background */
+        body::after {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(52, 199, 89, 0.04) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #app {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
-            transition: var(--transition);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        #fling-gpt-window:hover {
-            transform: scale(1.005);
-            border-color: rgba(76, 175, 80, 0.4);
-        }
-
-        #chat-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--accent);
-            letter-spacing: 1px;
-        }
-
-        #chat-window {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
+        #chat-container {
+            width: 100%;
+            max-width: 760px;
+            height: calc(100vh - 40px);
+            max-height: 880px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            box-shadow: var(--shadow), 0 0 0 0.5px rgba(255,255,255,0.04) inset;
+            overflow: hidden;
+            backdrop-filter: blur(40px) saturate(180%);
+            animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
         }
 
-        .bubble {
-            max-width: 80%;
-            padding: 14px 20px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text);
-            white-space: pre-wrap;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .user-msg {
-            align-self: flex-end;
-            background: var(--accent);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-msg {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom-left-radius: 4px;
-        }
-
-        .error-msg {
-            color: #ff6b6b;
-        }
-
-        .typing {
-            color: rgba(255,255,255,0.4);
-            font-style: italic;
-            font-size: 13px;
-        }
-
-        #controls {
-            padding: 25px;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        /* header */
+        #header {
+            padding: 18px 24px 16px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            gap: 15px;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
         }
 
-        input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 16px;
-            color: white;
-            outline: none;
-            font-size: 15px;
+        #header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        input:focus {
-            border-color: rgba(76, 175, 80, 0.5);
-        }
-
-        button {
+        #status-dot {
+            width: 8px;
+            height: 8px;
             background: var(--accent);
-            color: white;
-            border: none;
-            padding: 0 32px;
-            border-radius: 14px;
-            font-weight: bold;
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent); }
+            50% { opacity: 0.6; box-shadow: 0 0 3px var(--accent); }
+        }
+
+        #header-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+        }
+
+        #header-version {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-left: 2px;
+        }
+
+        #clear-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 5px 12px;
+            color: var(--text-secondary);
+            font-size: 12px;
             cursor: pointer;
             transition: var(--transition);
-            font-size: 15px;
+            font-family: inherit;
         }
 
-        button:hover {
-            transform: scale(1.05);
-            filter: brightness(1.2);
+        #clear-btn:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.04);
         }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        /* messages */
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+
+        #messages::-webkit-scrollbar { width: 4px; }
+        #messages::-webkit-scrollbar-track { background: transparent; }
+        #messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        .msg-row {
+            display: flex;
+            animation: msgIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-row.user { justify-content: flex-end; }
+        .msg-row.ai { justify-content: flex-start; }
+
+        .bubble {
+            max-width: 72%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14.5px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .bubble.user {
+            background: var(--user-bubble);
+            color: var(--text-primary);
+            border-bottom-right-radius: 5px;
+            border: 1px solid rgba(52, 199, 89, 0.2);
+        }
+
+        .bubble.ai {
+            background: var(--ai-bubble);
+            color: var(--text-primary);
+            border-bottom-left-radius: 5px;
+            border: 1px solid var(--border);
+        }
+
+        .bubble.error {
+            color: #ff453a;
+            background: rgba(255, 69, 58, 0.08);
+            border-color: rgba(255, 69, 58, 0.2);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 14px 18px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typingDot 1.2s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingDot {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        /* input area */
+        #input-area {
+            padding: 14px 16px 18px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        #input-wrap {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            transition: var(--transition);
+        }
+
+        #input-wrap:focus-within {
+            border-color: rgba(52, 199, 89, 0.35);
+            background: rgba(44, 44, 46, 0.9);
+        }
+
+        #userInput {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14.5px;
+            font-family: inherit;
+            padding: 13px 0;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        #userInput::placeholder { color: var(--text-secondary); }
+
+        #sendBtn {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        #sendBtn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        #sendBtn:active { transform: scale(0.97); }
+        #sendBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        #sendBtn svg { width: 16px; height: 16px; fill: white; }
+
+        /* welcome message label */
+        .msg-label {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.02em;
         }
     </style>
 </head>
 <body>
+<div id="app">
+    <div id="chat-container">
+        <div id="header">
+            <div id="header-left">
+                <div id="status-dot"></div>
+                <div>
+                    <span id="header-title">FlingGPT</span>
+                    <span id="header-version">— version 0.9</span>
+                </div>
+            </div>
+            <button id="clear-btn">Clear</button>
+        </div>
 
-<div class="bg-screenshot"></div>
+        <div id="messages">
+            <div class="msg-label">FTAP knowledge base loaded</div>
+            <div class="msg-row ai">
+                <div class="bubble ai">What do you want to know?</div>
+            </div>
+        </div>
 
-<div id="fling-gpt-window">
-    <div id="chat-header">FLINGGPT — FTAP CONSULTANT</div>
-    <div id="chat-window">
-        <div class="bubble ai-msg">FlingGPT Online. Full FTAP Knowledge Base Loaded. What is the move?</div>
-    </div>
-    <div id="controls">
-        <input type="text" id="userInput" placeholder="Ask FlingGPT...">
-        <button id="sendBtn">SEND</button>
+        <div id="input-area">
+            <div id="input-wrap">
+                <input type="text" id="userInput" placeholder="Ask FlingGPT...">
+            </div>
+            <button id="sendBtn" aria-label="Send">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -332,3 +509,4 @@ AS — russian only clan. mostly aggressive-fast players doing group fights and 
 </script>
 </body>
 </html>
+
