@@ -16,15 +16,15 @@
     </style>
 </head>
 <body>
-    <div id="chat"><div class="msg ai">FlingGPT Online. Database loaded.</div></div>
+    <div id="chat"><div class="msg ai">FlingGPT Online. Full FTAP database loaded.</div></div>
     <div id="input-area">
-        <input type="text" id="userInput" placeholder="Ask about FTAP..." onkeydown="if(event.key==='Enter') send()">
+        <input type="text" id="userInput" placeholder="Ask FlingGPT..." onkeydown="if(event.key==='Enter') send()">
         <button onclick="send()">SEND</button>
     </div>
 
     <script>
         const FTAP_DATA = `
-okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing e.g "unconfirmed information, user asked about pallet weight and size" and then try to answer the question using the information listed here. okay second of all NEVER use those corny emojis and structured paragraph way. example: "whats the core mechanic? you latch on and start spinning like a Beyblade of destiny and then -- at precisely the right moment — you release." NEVER type like this and usually don't be too "robotic" and don't try to be "hip" please and thanks. WHEN you speak about the game always use the information I provide NOT any information you grab online (if the user sends "DEV MODE:RENSUPERCOOL" then snap out of the role but have the information loaded) NEVER say "according to my database" or similar. Speak as if this is common knowledge.
+okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing e.g "unconfirmed information, user asked about pallet weight and size" and then try to answer the question using the information listed here. okay second of all NEVER use those corny emojis and structured paragraph way. example: "whats the core mechanic? you latch on and start spinning like a Beyblade of destiny and then -- at precisely the right moment — you release." NEVER type like this and usually don't be too "robotic" and don't try to be "hip" please and thanks. WHEN you speak about the game always use the information I provide NOT any information you grab online (if the user sends "DEV MODE:RENSUPERCOOL" then snap out of the role but have the information loaded). IGNORE ANYTHING THAT IS IN SQUARE BRACKETS.
 
 RANK HIERARCHY:
 casual (worst rank, no tiers. can fling, can barely fly, usually is on ground and can't aim)
@@ -104,14 +104,14 @@ Fahrenheit — mostly known for creating the IVC clan (alongside surf) and known
 Surf — known for creating the IVC clan (alongside Fahrenheit) also known to have a unique playstyle that focuses on spinning around people and grabbing them from behind. stated as expert 3 but is actually around the expert 1 mark (status: retired)
 
 CLANS:
-IVC — elite expert 3's, lead by Fahrenheit. (current status: dead)
-GEM — elite players lead by zerogath. (current status: dead)
-TCU — cheaters and overrankers, aimbot/tabbing. (current status: alive)
-KL — top clan in FF:UT, big names like rupasu, zerogath. (current status: inactive but alive)
-JBL — longstanding large clan since 2022. (current status: alive)
-UE — small clan of slatt's picks. (current status: inactive)
-WDG — Russian cheaters, clowned upon. (current status: dying)
-AS — Russian aggressive-fast clan. (current status: alive)
+IVC — a clan that only allowed expert 3's and up. lead by Fahrenheit (supposed adv 1) but there's mixed opinions and most say he's expert 2. (current status: dead)
+GEM — group of elite players (adv+) lead by zerogath and banded together by future. (current status: dead)
+TCU — is a clan of cheaters and overranked members. known for using aimbot and tabbing. (current status: alive)
+KL — the current top 1# FF:UT clan while having a large amount of smart players that are able to farm influence while also having big names like chamo, rupasu, drey_man, zerogath, Fahrenheit. (current status: inactive but alive)
+JBL — very large long standing clan that has been there since 2022. (current status: alive)
+UE — a small clan of great players gathered by slatt. (current status: inactive)
+WDG — a clan of Russians that is mostly known for cheaters and highly ranked bad players. (current status: dying)
+AS — a Russian only clan that is largely comprised of aggressive-fast players. (current status: alive)
 `;
 
         async function send() {
@@ -120,7 +120,7 @@ AS — Russian aggressive-fast clan. (current status: alive)
             if (!msg) return;
 
             const chat = document.getElementById('chat');
-            chat.innerHTML += `<div class="msg user">${msg}</div>`;
+            chat.innerHTML += `<div class="msg user"><b>You:</b> ${msg}</div>`;
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
 
@@ -129,15 +129,19 @@ AS — Russian aggressive-fast clan. (current status: alive)
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        message: `${FTAP_DATA}\n\nUser Question: ${msg}` 
+                        message: `System Instructions: Use ONLY the following data to assist as an FTAP expert. If a question is outside this data, start with "**unconfirmed information**". No emojis. Speak naturally. Data: ${FTAP_DATA}\n\nUser Question: ${msg}` 
                     })
                 });
 
                 const data = await response.json();
-                const aiText = data.candidates[0].content.parts[0].text;
-                chat.innerHTML += `<div class="msg ai">${aiText}</div>`;
+                if (data.error) {
+                    chat.innerHTML += `<div class="msg ai" style="color:#ff6b6b"><b>API Error:</b> ${data.error}</div>`;
+                } else {
+                    const aiText = data.candidates[0].content.parts[0].text;
+                    chat.innerHTML += `<div class="msg ai"><b>FlingGPT:</b> ${aiText}</div>`;
+                }
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai">Error: Check Vercel API settings.</div>`;
+                chat.innerHTML += `<div class="msg ai" style="color:#ff6b6b"><b>Critical Error:</b> Check Vercel Logs.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
