@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Switched to v1 stable endpoint to fix the "model not found" error
+    // This uses the STABLE v1 endpoint, not v1beta
     const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
