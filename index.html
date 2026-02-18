@@ -246,7 +246,7 @@ AS — a Russian only clan that is largely comprised of aggressive-fast players 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        message: `Context: ${FTAP_DATA}\n\nUser Question: ${msg}` 
+                        message: `System Instructions: You are the FlingGPT expert for FTAP. Use the provided context to answer questions. If the info isn't there, start with "**unconfirmed information**". No robotic talk. Context: ${FTAP_DATA}\n\nUser Question: ${msg}` 
                     })
                 });
 
