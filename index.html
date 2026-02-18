@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlingGPT | FTAP Consultant</title>
     <style>
         :root {
-            --glass: rgba(15, 15, 15, 0.85);
+            --glass: rgba(10, 10, 10, 0.8);
             --accent: #4caf50;
-            --text: #e0e0e0;
+            --text: #f5f5f5;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
-            cursor: url('cursor.png'), auto; /* Custom Cursor */
+            /* Custom Cursor */
+            cursor: url('cursor.png'), auto;
         }
 
         body {
@@ -22,141 +25,154 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #000;
             overflow: hidden;
         }
 
-        /* Blurred Background Layer */
-        .background-blur {
+        /* Background Layer with Blur */
+        .bg-screenshot {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('bg.png'); /* Your screenshot */
+            background-image: url('bg.png');
             background-size: cover;
             background-position: center;
-            filter: blur(15px);
-            transform: scale(1.1);
+            filter: blur(12px) brightness(0.6);
+            transform: scale(1.1); /* Prevents edges showing from blur */
             z-index: -1;
         }
 
-        /* Main UI Window */
-        #fling-window {
+        /* Main UI Container */
+        #fling-gpt-window {
             width: 90%;
-            max-width: 900px;
-            height: 80vh;
+            max-width: 850px;
+            height: 85vh;
             background: var(--glass);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+            transition: var(--transition);
         }
 
-        #fling-window:hover {
-            transform: scale(1.01);
-            border-color: rgba(76, 175, 80, 0.3);
+        #fling-gpt-window:hover {
+            transform: scale(1.005);
+            border-color: rgba(76, 175, 80, 0.4);
         }
 
-        #chat-area {
+        #chat-window {
             flex: 1;
             overflow-y: auto;
             padding: 30px;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
         }
 
         .bubble {
             max-width: 80%;
-            padding: 15px 20px;
+            padding: 14px 20px;
             border-radius: 18px;
             font-size: 15px;
             line-height: 1.6;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             color: var(--text);
+            position: relative;
         }
 
         .bubble:hover {
-            transform: scale(1.03);
-            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.02);
+            filter: brightness(1.1);
         }
 
-        .user-bubble {
+        .user-msg {
             align-self: flex-end;
             background: var(--accent);
             color: white;
             border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
 
-        .ai-bubble {
+        .ai-msg {
             align-self: flex-start;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom-left-radius: 4px;
         }
 
-        #input-container {
+        /* Input Area Styles */
+        #controls {
             padding: 25px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.3);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             gap: 15px;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
         }
 
         input {
             flex: 1;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 15px 20px;
+            border-radius: 14px;
+            padding: 16px;
             color: white;
+            font-size: 15px;
             outline: none;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         input:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
         button {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 0 35px;
-            border-radius: 15px;
+            padding: 0 32px;
+            border-radius: 14px;
             font-weight: bold;
-            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
         }
 
         button:hover {
-            transform: scale(1.08);
-            filter: brightness(1.1);
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            transform: translateY(-2px) scale(1.05);
+            filter: brightness(1.2);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
         }
 
-        /* Scrollbar styling */
-        #chat-area::-webkit-scrollbar { width: 6px; }
-        #chat-area::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Custom Scrollbar for Chrome/Safari */
+        #chat-window::-webkit-scrollbar { width: 6px; }
+        #chat-window::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="background-blur"></div>
+    <div class="bg-screenshot"></div>
 
-    <div id="fling-window">
-        <div id="chat-area">
-            <div class="bubble ai-bubble">FlingGPT Online. Database loaded. Ask me about FTAP.</div>
+    <div id="fling-gpt-window">
+        <div id="chat-window">
+            <div class="bubble ai-msg">FlingGPT Online. System loaded. How can I assist you with FTAP today?</div>
         </div>
-        <div id="input-container">
-            <input type="text" id="userInput" placeholder="Type a message...">
+        <div id="controls">
+            <input type="text" id="userInput" placeholder="Ask about ranks, players, or mechanics...">
             <button id="sendBtn">SEND</button>
         </div>
     </div>
@@ -165,104 +181,64 @@
         const API_KEY = 'AIzaSyAf5IdN50RJK5DplSu_bNbdeDzuS8Y8OSo';
 
         const FTAP_DATA = `
-okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing e.g "unconfirmed information, user asked about pallet weight and size" and then try to answer the question using the information listed here. okay second of all NEVER use those corny emojis and structured paragraph way. example: "whats the core mechanic? you latch on and start spinning like a Beyblade of destiny and then -- at precisely the right moment — you release." NEVER type like this and usually don't be too "robotic" and don't try to be "hip" please and thanks. WHEN you speak about the game always use the information I provide NOT any information you grab online (if the user sends "DEV MODE:RENSUPERCOOL" then snap out of the role but have the information loaded) NEVER say "according to the database i have" or whatnot. make it so the info flows naturally. sort of like this is already common known things.
+        okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing. NEVER use those corny emojis and structured paragraph way. don't be too "robotic" and don't try to be "hip". WHEN you speak about the game always use the information I provide NOT any information you grab online.
 
-IGNORE ANYTHING THAT IS IN SQUARE BRACKETS SHOULD BE IGNORED BY AI
----
+        RANK HIERARCHY:
+        casual (worst rank, can fling, can't aim)
+        apprentice-app (fly, easy grabs, low-mid-high)
+        skillful-sk (Tiers I-II-III, low-mid-high, juking, 10/10 grabs)
+        expert-exp (amazing aim or movement, best in server)
+        advanced-adv (rare, extreme aim/movement, known players)
+        fling god-fg (No tiers, very rare levels)
 
-RANK HIERARCHY:
-casual (worst rank, no tiers. can fling, can barely fly, usually is on ground and can't aim)
-apprentice-app (much better, no tiers, only low-mid-high, CAN fly, CAN usually grab easy grabs when both players are facing each other SOME have skillful level movement)
-skillful-sk (where people start getting good, most common rank, HAS tiers I-II-III also referred to as 1-2-3 use this tier ranking for all the rest of the ranks EXCEPT fling god. skillful 1's can fly without falling, can grab easy grabs 10/10, can juke people out by quickly changing directions. ALSO every tier has another rating system as low-mid-high, it is very commonly used. also it's the most common rank FOR COMP PLAYERS, the actual most common overall is casual)
-expert-exp (as the name says, experts. they're usually REALLY good at movement OR aiming, even the lower tiers. they can almost always grab, they're often the best in the server, they're always outstanding and always good to have on your side, they can differ from being extreme aimers and low movement to extreme movement and no aim)
-advanced-adv (basically unheard of, VERY rare to spot in servers, ALMOST always good at both aim and movement, only few exceptions, very exceptional, known players and almost beat out every player, 1's are rare as is but 2's and 3's don't really exist as they're mostly overranked or just cheaters)
-fling god-fg (NO tiers just levels, very VERY VERY rare rank with only the most notable of the notable getting it)
+        CORE MECHANICS:
+        flinging (hit floor to ragdoll, flick low), Ragdolling (high speed grabs), Aiming (30 stud reach), Movement (no dash/hop, manual scroll physics, "The Dive").
 
-CORE MECHANICS:
-flinging isn't really a mechanic that's built into the game, sorta just naturally discovered. it's usually done by grabbing your opponent and moving them around to hit the floor so you can ragdoll them (which just makes flings more consistent and harder to clutch) and then you look behind you and try to fling them in a really low (but not touching the ground low) way so that they can't clutch. it's done by flicking decently quickly
-ragdolling is not really a big mechanic in the game, often overlooked. it just happens whenever you grab someone at decently high speeds (so basically any air-to-air fight)
-flung players can't really move left or right unless they are not ragdolled, and even if so they can like inch VERY slowly towards any direction, so most players hold the S key to go back and look in the way they got thrown so that they can at least lessen the fling. unless you're on 2k ping or more it doesn't really get affected that much
-aiming is just like an fps but since the players move really quickly it's a really hard game with timing being just as if not even more important than aim. it is proximity based, there is a 30 stud reach in the game so you can't be grabbing from the other side of the map
+        AG (ANTI GRAB):
+        Distance check by horomori, cancels grabs at high speed/ping.
 
-MOVEMENT:
-the movement system is like having a garry's mod physics gun shot at the plank/pallet (it has a limited range of 30 studs) it's also your range of grabbing. you can scroll out to go faster, and also grab the pallet further back (less control but fast) or you can do the opposite and grab it really high and not scroll as much. you can do moves such as looking down and scrolling out (makes you go down fast) — this is called the dive — or you can grab really high and scroll back to drag yourself back and upwards. THERE IS NO in game mechanic for movement (dashing, bunny hopping, etc..) ALL movement is done by users and created by users
+        CLUTCHING:
+        Double pallet (sub-100 ping), Tabbing (right click exploit), Shuriken (sticky item), Dunking (throws down to kill).
 
-AG (ANTI GRAB):
-ag (short for anti grab) is a distance check made by the game's dev "horomori". it's used to stop infinite reach exploits (which it does well but it fricks all of us pvp'ers over) so whenever someone moves too fast in too high of ping an ag occurs, that means the grab gets CANCELED which is a pain cuz you struggled to get it. it usually also happens when someone dashes back or dives when you rush them. it's what makes rupasu so great, he makes it so rushing him gives you an ag but he can just stop and grab you
+        PLAYSTYLES:
+        Fast (High FPS boost, aggressive, controlled), Slow (Very slow like Chamo, Elite slow like Rupasu).
 
-CLUTCHING:
-clutching is ftap's most unfair mechanic, it's VERY ping based with sub-100 ping players being able to do a "double pallet" clutch via looking down and spawning pallets. they can spawn a pallet under them while being flung AND JUMP on said pallet to get a height boost and then after that they can spawn a pallet normally and grab it. since normal players CANT do that it's really unfair to fling them, the only way to really kill them is a very low fling (doesn't work on sub-40 ping) or just dunking them, which is hard to do cuz the places people usually fight at doesn't have water all around it, instead just one side
-dunking is just the act of throwing in a downwards manner, it eliminates any sort of clutching except tabbing and maybe shuriken
-tabbing is just the act of holding right click on the roblox window causing the game to freeze and FTAP to bug out and send you to the nearest solid floor. it's an exploit that's very frowned upon
-shuriken is the act of spawning a shuriken under you so that it sticks to you (it's a sticky item in FTAP) so whenever you get flung it's just below you so you can look down and grab it, sort of simulating a double pallet clutch but on steroids
+        PLAYERS:
+        future (Fling God, jukey), spence (#1, slow aim), LostNPC (Expert 2, controlled fast), zerogath (rank creator), rupasu (Adv 2, elite slow), chamo (Adv 3, slow revolution), spiritsweat (Expert 3, scripts), spaze (sk3, 300 ping), drey_man (Adv 1), KL_Cabs (KL leader), markakela_AS (Adv 2), verlxren_UE (Adv 3), slatt (Adv 1), crisila_TCU (Sk2, cheater), qevus (Expert 3, toxic), J_husky01 (Fast, great aim), Fahrenheit (Expert 2), Surf (Expert 1).
 
-PLAYSTYLES:
-every playstyle branches off from the fast/slow playstyle. SOME players play in a hybrid way but that's sorta rare. the base that everyone starts from is just grabbing the pallet center mass and moving left and right, it's really basic with no depth and more used as a foundation for other playstyles
-FAST PLAYER ARCHETYPES:
-high fps — in ftap FPS means speed, so there are some players that have 1k+ fps (usual is below 200) and they get a massive speed boost and control boost. they usually spam the dive and since they have a lot of control they can stop whenever they dive and they move a lot faster than usual. fighting them is hell. the fps advantage isn't really known by sub-expert players, but the people who do know consider it very unfair as it's just the other player's pc being able to simulate the physics a lot faster causing it to be sort of pay to win, and there are 0 downsides
-aggressive-fast — they're usually decent at aiming and they spam rushes against their opponents and they usually never do fancy stuff
-controlled-fast — we already know that LostNPC plays like that. it's a really good playstyle that can have any move added to it and still flows naturally. players like this never usually leave the expert 2 mark but there are some exceptions
-SLOW PLAYER ARCHETYPES:
-very slow-slow — players like this (chamo) are usually really slow and never really do any move except the dive. IF and when you do rush them you get grabbed cuz they usually dash back and grab YOU instead
-hybrid-slow — players like this are usually never actually slow players, they convert to slow whenever you rush them or do a stupid move (since moving slower = more reaction time)
-elite slow (rupasu's style) — the most effective and elite type, only really used by rupasu. if and when you rush them they WILL dive and grab you while they're down (unheard of) so grabbing them depends on tricking them. usually this is done by rushing at them, making them dive, and then YOU stop rushing and do a dive to break the timing and grab them
-HOW TO BEAT A SLOW PLAYER:
-you can't just rush them straight up — that's exactly what they want. bait out their dive, rush at them, make them commit to the dodge, and then YOU stop rushing and do your own dive to break their timing and grab them while they're resetting. against rupasu specifically this barely works either
-
-PALLET THROWING:
-throwing a pallet is a high risk move due to the fact you can just throw it too far or get an ag on the pallet. it also is really hard to grab while doing that so that's why rainz stops whenever he grabs. he rarely does grabs while moving. it's semi unheard of as a technique
-
-GAME MODES / FORMAT:
-there are absolutely NO game modes for pvp. ALL pvp is done either by joining a public lobby and looking for people to fight OR adding people you know from discord to do 1v1's, 2v2's, 3v3's, FFA's, etc... 1v1's are way more common than 2v2's and such but FFA's are decently popular
-the map stays the same with little to no updates. and if there are updates they're usually maps made in advance from 2-3 years ago e.g the christmas map, the feb 14th map, or independence day
-
-RANKING HISTORY:
-there used to be a community server with all the fling gods and players getting ranked but it died around 2024 (unconfirmed). at those times ranks by the server (Fling Enthusiasts) were 100% guaranteed to be true because the creator himself ranked you (zerogath). but later on it died and there was a newer server made known as "Fling Syndicate". zerogath controlled this one for a short period and then handed it to spence. later on the ranks started being made by high skilled players and not zerogath himself so they weren't 100% but they were like 90%. Fling Syndicate later died and was abandoned by spence, so since 2024 we had no official ranking servers. instead known players started to rank (some being good some being bad) and it later devolved into everyone ranking (even apprentices)
-current trusted rankers are just known players or people who have reached high ranks (expert 2 and up). there has been a lot of overrankers with whole clans being known as incorrect at ranking (TCU, WDG, random russian clans)
-
-FLING GODS:
-all fling gods don't play the game anymore + they played 1-2 years ago. ranks listed are their peaks
-pastdoa / futurekiddo (referred to as future) — considered the most outstanding fling god. he was the most jukey and was known to out-movement people so much they were in awe and tried to copy him. he never had a set playstyle, he just changes it depending on who he fights. for example against slow players he spins around them and goes under to try to lose their aim THEN grab
-spence — one of the most known fling gods and hailed as the #1 of the game. he was REALLY fast before (cited as an insanely fast that utilized dives) but later transitioned into a really slow aim heavy playstyle, which inspired chamo. he later ran Fling Syndicate before abandoning it
-LostNPC — a fast and controlled player (mid pallet grabbing with high scrolling). INSANELY consistent, never really falling below expert 2 and only needing a few days to get back. had amazing aim, was hailed as top 1 after the big dogs retired. zerogath was his teacher
-zerogath — THAT guy. he made the ranks (not confirmed) and was the first fling god alongside spence (LostNPC states that he was better than spence). he's now at around skillful 2-3 but has insane experience since he ranked a lot of players. he had a controlled fast playstyle and he created the left and right basic movement style and dominated with it, refining it with the dive later on ran both Fling Enthusiasts and Fling Syndicate at different points
-rainz — known for grabbing the pallet and THROWING IT and then doing it again and again to completely get behind his opponent. pallet throwing is semi unheard of and he's one of the only ones known for it
-
-REMARKABLE PLAYERS:
-spiritsweat (active, expert 3, high fps/scripts), spaze (retired, sk3, high ping), rupasu (retired, adv 2, elite slow style), chamo (retired, adv 3, slow player revolution), drey_man (retired, adv 1, chamo student), KL_Cabs (active, leader of KL, peak expert 1), markakela_AS (inactive, leader of AS, adv 2), verlxren_UE (adv 3), slatt_JBLxUE (retired, JBL/UE, adv 1), crisila_TCU (active, TCU, skillful 2, cheater), qevus (retired, expert 3), J_husky01 (retired, fast), cheesman (retired, adv 3), minzo (retired, adv 2), Fahrenheit (retired, expert 2, IVC leader), Surf (retired, expert 1, IVC creator).
-
-CLANS:
-IVC (Dead, elite expert 3+), GEM (Dead, legend tier), TCU (Alive, cheater/overrankers), KL (Active, top FF:UT clan), JBL (Alive, longstanding), UE (Inactive, slatt's elite picks), WDG (Dying, russian cheaters), AS (Alive, russian aggressive-fast).
-`;
+        CLANS:
+        IVC (Expert 3+, dead), GEM (Legend tier, dead), TCU (Cheaters, alive), KL (Top FF:UT, alive), JBL (Large, alive), UE (Elite, inactive), WDG (Russian cheaters, dying), AS (Russian aggressive-fast).
+        `;
 
         async function send() {
             const input = document.getElementById('userInput');
             const msg = input.value.trim();
-            if (!msg || API_KEY === 'PASTE_YOUR_GEMINI_KEY_HERE') return;
+            if (!msg || API_KEY === 'PASTE_YOUR_API_KEY_HERE') return;
 
-            const chat = document.getElementById('chat-area');
-            chat.innerHTML += `<div class="bubble user-bubble">${msg}</div>`;
+            const chat = document.getElementById('chat-window');
+            chat.innerHTML += `<div class="bubble user-msg">${msg}</div>`;
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                // Changed URL to v1/models/gemini-1.5-flash for stability
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: `Instructions: You are FlingGPT. Use ONLY this data. If info is missing, say **unconfirmed information**. No robotic talk. Data: ${FTAP_DATA}\n\nUser Question: ${msg}` }] }]
+                        contents: [{ parts: [{ text: `Instructions: You are FlingGPT. Use ONLY this context. If info is missing, say **unconfirmed information**. No robotic/hip talk. Context: ${FTAP_DATA}\n\nUser Question: ${msg}` }] }]
                     })
                 });
 
                 const data = await response.json();
                 if (data.error) {
-                    chat.innerHTML += `<div class="bubble ai-bubble" style="color:#ff6b6b">Error: ${data.error.message}</div>`;
+                    chat.innerHTML += `<div class="bubble ai-msg" style="color:#ff6b6b">Error: ${data.error.message}</div>`;
                 } else {
                     const aiText = data.candidates[0].content.parts[0].text;
-                    chat.innerHTML += `<div class="bubble ai-bubble">${aiText}</div>`;
+                    chat.innerHTML += `<div class="bubble ai-msg">${aiText}</div>`;
                 }
             } catch (e) {
-                chat.innerHTML += `<div class="bubble ai-bubble" style="color:#ff6b6b">Critical connection error.</div>`;
+                chat.innerHTML += `<div class="bubble ai-msg" style="color:#ff6b6b">Critical Error: Check connection or API key.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
@@ -272,4 +248,3 @@ IVC (Dead, elite expert 3+), GEM (Dead, legend tier), TCU (Alive, cheater/overra
     </script>
 </body>
 </html>
-
