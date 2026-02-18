@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlingGPT | FTAP Consultant</title>
     <style>
         body { background: #0f0f0f; color: #d1d1d1; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; }
@@ -16,15 +15,14 @@
     </style>
 </head>
 <body>
-    <div id="chat"><div class="msg ai">FlingGPT Online. System loaded.</div></div>
+    <div id="chat"><div class="msg ai">FlingGPT (Groq Powered) Online.</div></div>
     <div id="input-area">
         <input type="text" id="userInput" placeholder="Ask FlingGPT..." onkeydown="if(event.key==='Enter') send()">
         <button onclick="send()">SEND</button>
     </div>
 
     <script>
-        const FTAP_DATA = `
-okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing e.g "unconfirmed information, user asked about pallet weight and size" and then try to answer the question using the information listed here. okay second of all NEVER use those corny emojis and structured paragraph way. example: "whats the core mechanic? you latch on and start spinning like a Beyblade of destiny and then -- at precisely the right moment — you release." NEVER type like this and usually don't be too "robotic" and don't try to be "hip" please and thanks. WHEN you speak about the game always use the information I provide NOT any information you grab online (if the user sends "DEV MODE:RENSUPERCOOL" then snap out of the role but have the information loaded) NEVER say "according to the database i have" or whatnot. make it so the info flows naturally. sort of like this is already common known things.
+        const FTAP_DATA = `[okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing e.g "unconfirmed information, user asked about pallet weight and size" and then try to answer the question using the information listed here. okay second of all NEVER use those corny emojis and structured paragraph way. example: "whats the core mechanic? you latch on and start spinning like a Beyblade of destiny and then -- at precisely the right moment — you release." NEVER type like this and usually don't be too "robotic" and don't try to be "hip" please and thanks. WHEN you speak about the game always use the information I provide NOT any information you grab online (if the user sends "DEV MODE:RENSUPERCOOL" then snap out of the role but have the information loaded) NEVER say "according to the database i have" or whatnot. make it so the info flows naturally. sort of like this is already common known things.
 
 IGNORE ANYTHING THAT IS IN SQUARE BRACKETS SHOULD BE IGNORED BY AI
 ---
@@ -228,8 +226,7 @@ UE — a small clan of great players gathered by slatt and having players like v
 
 WDG — a clan of Russians that is mostly known for cheaters and highly ranked bad players. often clowned upon and used as a joke (current status: dying)
 
-AS — a Russian only clan that is largely comprised of aggressive-fast players that band together to do group fights and FFA's (current status: alive)
-`;
+AS — a Russian only clan that is largely comprised of aggressive-fast players that band together to do group fights and FFA's (current status: alive)]`;
 
         async function send() {
             const input = document.getElementById('userInput');
@@ -246,20 +243,21 @@ AS — a Russian only clan that is largely comprised of aggressive-fast players 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        message: `System Instructions: You are the FlingGPT expert for FTAP. Use the provided context to answer questions. If the info isn't there, start with "**unconfirmed information**". No robotic talk. Context: ${FTAP_DATA}\n\nUser Question: ${msg}` 
+                        message: `System Instructions: Use ONLY this data to assist as an FTAP expert. If a question is outside this data, start with "**unconfirmed information**". No emojis. Speak naturally. Data: ${FTAP_DATA}\n\nUser Question: ${msg}` 
                     })
                 });
 
                 const data = await response.json();
                 
                 if (data.error) {
-                    chat.innerHTML += `<div class="msg ai" style="color: #ff6b6b;"><b>Error:</b> ${data.error}</div>`;
+                    chat.innerHTML += `<div class="msg ai" style="color:#ff6b6b"><b>Error:</b> ${data.error}</div>`;
                 } else {
-                    const aiText = data.candidates[0].content.parts[0].text;
+                    // Groq format is different: data.choices[0].message.content
+                    const aiText = data.choices[0].message.content;
                     chat.innerHTML += `<div class="msg ai"><b>FlingGPT:</b> ${aiText}</div>`;
                 }
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai" style="color: #ff6b6b;"><b>Critical Error:</b> Check Vercel logs.</div>`;
+                chat.innerHTML += `<div class="msg ai" style="color:#ff6b6b"><b>Critical Error:</b> Site could not reach server.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
