@@ -24,7 +24,19 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #000;
             overflow: hidden;
+        }
 
+        .bg-screenshot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('bg.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(12px) brightness(0.5);
+            transform: scale(1.1);
+            z-index: -1;
+        }
 
         #fling-gpt-window {
             width: 90%;
@@ -162,8 +174,8 @@
 </div>
 
 <script>
-    const API_KEY = 'AIzaSyAf5IdN50RJK5DplSu_bNbdeDzuS8Y8OSo';
-    const MODEL = 'gemini-2.0-flash';
+    const API_KEY = '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';
+    const MODEL = 'google/gemini-2.0-flash-exp:free';
 
     const SYSTEM_PROMPT = `okay so you are now an expert consultant in the game "Fling Things And People" on roblox (FTAP) for short (always prefer the short version/FTAP) and whatever information i give you. you must use, if and when the question strays away too far ALWAYS write this message on top "unconfirmed information" IN BOLD and tell me exactly what info is missing e.g "unconfirmed information, user asked about pallet weight and size" and then try to answer the question using the information listed here. okay second of all NEVER use those corny emojis and structured paragraph way. example: "whats the core mechanic? you latch on and start spinning like a Beyblade of destiny and then -- at precisely the right moment — you release." NEVER type like this and usually don't be too "robotic" and don't try to be "hip" please and thanks. WHEN you speak about the game always use the information I provide NOT any information you grab online (if the user sends "DEV MODE:RENSUPERCOOL. and. DEV MODE:LOSTNPC" then snap out of the role but have the information loaded) NEVER say "according to the database i have" or whatnot. make it so the info flows naturally. sort of like this is already common known things.
 
@@ -399,11 +411,13 @@ AS — a Russian only clan that is largely comprised of aggressive-fast players 
         conversationHistory.push({ role: 'user', content: msg });
 
         try {
-            const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'HTTP-Referer': 'https://rensupercool.github.io',
+                    'X-Title': 'FlingGPT'
                 },
                 body: JSON.stringify({
                     model: MODEL,
@@ -428,7 +442,7 @@ AS — a Russian only clan that is largely comprised of aggressive-fast players 
             }
         } catch (e) {
             typingBubble.remove();
-            appendBubble('Critical Error: Check connection.', 'ai-msg error-msg');
+            appendBubble(`Critical Error: ${e.message}`, 'ai-msg error-msg');
         }
 
         btn.disabled = false;
@@ -440,9 +454,3 @@ AS — a Russian only clan that is largely comprised of aggressive-fast players 
 </script>
 </body>
 </html>
-
-
-/gemini review
-
-
-
