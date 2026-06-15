@@ -3,296 +3,829 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chat Assistant</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>FTAP Codex — Fling Things & People Guide</title>
+<meta name="description" content="An unofficial field guide to Fling Things And People (FTAP) on Roblox — ranks, mechanics, movement, advanced techniques, playstyles, fling gods, notable players and clans.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
   :root {
-    --bg: #05060a;
-    --surface: #0c0d18;
-    --border: #1b1d32;
-    --accent: #5b8cff;
-    --accent-soft: rgba(91, 140, 255, 0.14);
-    --accent2: #f5b567;
-    --text: #f5f5ff;
-    --muted: #7f8295;
-    --user-bubble: #131528;
-    --ai-bubble: #101222;
-    --radius-lg: 18px;
+    --bg: #06070d;
+    --bg-2: #0a0c16;
+    --surface: rgba(18, 20, 34, 0.72);
+    --surface-solid: #11131f;
+    --border: rgba(120, 130, 180, 0.14);
+    --border-strong: rgba(120, 130, 180, 0.3);
+    --accent: #6ea8ff;
+    --accent-2: #c08bff;
+    --accent-3: #ffb86b;
+    --good: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --text: #eef0fb;
+    --muted: #969ab5;
+    --muted-2: #6b6f8a;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+    --maxw: 1180px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+  html { scroll-behavior: smooth; scroll-padding-top: 90px; }
 
   body {
-    background: radial-gradient(circle at top, #111827 0, #020617 55%);
+    background: var(--bg);
     color: var(--text);
-    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .noise-overlay {
+  h1, h2, h3, h4, .display { font-family: 'Space Grotesk', sans-serif; }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Animated aurora background ---------- */
+  .aurora {
     position: fixed;
     inset: 0;
-    pointer-events: none;
-    opacity: 0.16;
-    mix-blend-mode: soft-light;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1600 900' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E");
-    z-index: 0;
-  }
-
-  nav {
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    height: 60px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(5, 6, 14, 0.96);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    z-index: 10;
-  }
-
-  .nav-logo {
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: #f5f5ff;
-  }
-
-  .nav-status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #2ecc71;
-    animation: blink 2s infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .chat-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    z-index: -2;
     overflow: hidden;
-    position: relative;
-    z-index: 10;
+    background:
+      radial-gradient(900px 600px at 12% -5%, rgba(110, 168, 255, 0.16), transparent 60%),
+      radial-gradient(800px 600px at 95% 0%, rgba(192, 139, 255, 0.14), transparent 55%),
+      radial-gradient(700px 700px at 60% 110%, rgba(255, 184, 107, 0.08), transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  }
+  .aurora::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: conic-gradient(from 0deg, transparent, rgba(110,168,255,0.06), transparent 40%, rgba(192,139,255,0.06), transparent 75%);
+    animation: spin 40s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(120,130,180,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,130,180,0.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 90%);
   }
 
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+  /* ---------- Nav ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(6, 7, 13, 0.7);
+    border-bottom: 1px solid var(--border);
   }
-
-  .chat-messages::-webkit-scrollbar { width: 3px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); }
-
-  .welcome {
-    margin: auto;
-    text-align: center;
-    padding: 32px 24px;
-    max-width: 480px;
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-  }
-
-  .welcome-logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 6px;
-  }
-
-  .welcome-sub {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .msg {
-    display: flex;
-    flex-direction: column;
-    max-width: 80%;
-    animation: msgIn 0.18s ease;
-  }
-
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.ai { align-self: flex-start; align-items: flex-start; }
-
-  .msg-who {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
-
-  .msg.user .msg-who { color: var(--accent2); }
-  .msg.ai .msg-who { color: var(--accent); }
-
-  .bubble {
-    padding: 12px 16px;
-    font-size: 14px;
-    line-height: 1.6;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-  }
-
-  .msg.user .bubble {
-    background: var(--user-bubble);
-    border-color: #22253a;
-  }
-
-  .msg.ai .bubble {
-    background: var(--ai-bubble);
-    border-left: 2px solid var(--accent);
-  }
-
-  .typing-dots {
-    display: flex;
-    gap: 4px;
-    padding: 10px 14px;
-    background: #101222;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    border-left: 2px solid var(--accent);
-    width: fit-content;
-  }
-
-  .typing-dots span {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    opacity: 0.5;
-    animation: tdot 1.2s infinite;
-  }
-
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes tdot {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-    30% { transform: translateY(-5px); opacity: 1; }
-  }
-
-  .input-area {
-    border-top: 1px solid var(--border);
-    background: #05060c;
-    padding: 16px 24px;
-  }
-
-  .input-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-    max-width: 900px;
+  .nav-inner {
+    max-width: var(--maxw);
     margin: 0 auto;
-    width: 100%;
-  }
-
-  textarea {
-    flex: 1;
-    background: #05060c;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 14px;
-    padding: 12px;
-    resize: none;
-    outline: none;
-    line-height: 1.5;
-    min-height: 46px;
-    max-height: 140px;
-    transition: border-color 0.15s ease, background 0.15s ease;
-    border-radius: 10px;
-  }
-
-  textarea:focus {
-    border-color: var(--accent);
-    background: #080a14;
-  }
-  textarea::placeholder { color: var(--muted); }
-
-  .send {
-    background: var(--accent);
-    border: none;
-    color: #05060a;
-    font-weight: 600;
-    font-size: 14px;
     padding: 0 24px;
-    height: 46px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-    white-space: nowrap;
-    border-radius: 10px;
+    height: 66px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
   }
-
-  .send:hover {
-    background: #527fe3;
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; font-size: 19px; letter-spacing: 0.5px; }
+  .brand .mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center;
+    font-family: 'Space Grotesk';
+    font-weight: 700;
+    color: #06070d;
+    font-size: 15px;
+    box-shadow: 0 6px 20px -6px rgba(110,168,255,0.6);
   }
-
-  .send:disabled {
-    background: #1a1c2a;
+  .brand small { color: var(--muted); font-weight: 500; font-size: 11px; letter-spacing: 1.4px; display: block; margin-top: -3px; }
+  nav.links { margin-left: auto; display: flex; gap: 4px; }
+  nav.links a {
+    font-size: 13.5px;
     color: var(--muted);
-    cursor: not-allowed;
+    padding: 8px 13px;
+    border-radius: 9px;
+    font-weight: 500;
+    transition: color 0.18s, background 0.18s;
+  }
+  nav.links a:hover { color: var(--text); background: rgba(120,130,180,0.08); }
+
+  .menu-btn { display: none; margin-left: auto; background: none; border: 1px solid var(--border-strong); color: var(--text); border-radius: 9px; width: 42px; height: 40px; cursor: pointer; font-size: 18px; }
+
+  /* ---------- Layout ---------- */
+  main { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  section { padding: 72px 0 8px; }
+  .section-head { margin-bottom: 30px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Grotesk';
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 2px; background: linear-gradient(90deg, var(--accent), transparent); border-radius: 2px; }
+  .section-head h2 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; letter-spacing: -0.5px; }
+  .section-head p { color: var(--muted); max-width: 720px; margin-top: 10px; font-size: 15px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 96px 0 40px; text-align: center; }
+  .hero .tag {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 7px 15px;
+    border: 1px solid var(--border-strong);
+    border-radius: 100px;
+    font-size: 12.5px; color: var(--muted);
+    background: var(--surface);
+    margin-bottom: 26px;
+  }
+  .hero .tag .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 0 rgba(74,222,128,0.6); animation: pulse 2s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); } 70% { box-shadow: 0 0 0 9px rgba(74,222,128,0); } 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); } }
+  .hero h1 {
+    font-size: clamp(44px, 9vw, 92px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 0.98;
+    background: linear-gradient(180deg, #ffffff 30%, #9fb4ec 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(110deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero .lede { max-width: 620px; margin: 24px auto 0; color: var(--muted); font-size: 17px; }
+  .hero-cta { display: flex; gap: 14px; justify-content: center; margin-top: 34px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 24px; border-radius: 12px;
+    font-weight: 600; font-size: 14.5px; cursor: pointer;
+    border: 1px solid transparent; transition: transform 0.12s, box-shadow 0.2s, background 0.2s;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #06070d; box-shadow: 0 14px 34px -12px rgba(110,168,255,0.7); }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-ghost { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+  .btn-ghost:hover { background: rgba(120,130,180,0.1); }
+
+  .stats-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-top: 56px;
+  }
+  .stats-strip div { background: var(--surface-solid); padding: 22px 16px; text-align: center; }
+  .stats-strip .num { font-family: 'Space Grotesk'; font-size: 30px; font-weight: 700; color: #fff; }
+  .stats-strip .lbl { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+
+  /* ---------- Cards ---------- */
+  .grid { display: grid; gap: 18px; }
+  .cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow); }
+  .card h3 { font-size: 18px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 14.5px; }
+  .card .icon { font-size: 22px; margin-bottom: 12px; display: block; }
+
+  /* ---------- Rank ladder ---------- */
+  .ladder { display: flex; flex-direction: column; gap: 12px; }
+  .rank-row {
+    display: grid; grid-template-columns: 120px 1fr; gap: 18px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--rc, var(--accent));
+    border-radius: var(--radius-sm); padding: 16px 20px;
+    transition: transform 0.18s, background 0.18s;
+  }
+  .rank-row:hover { transform: translateX(4px); background: rgba(120,130,180,0.07); }
+  .rank-badge {
+    font-family: 'Space Grotesk'; font-weight: 700; font-size: 14px;
+    text-align: center; padding: 8px 6px; border-radius: 9px;
+    background: color-mix(in srgb, var(--rc, var(--accent)) 18%, transparent);
+    color: var(--rc, var(--accent));
+    border: 1px solid color-mix(in srgb, var(--rc, var(--accent)) 35%, transparent);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .rank-row .meta { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .rank-row .meta strong { font-family: 'Space Grotesk'; font-size: 16px; }
+  .rank-row .meta .tier { font-size: 11px; color: var(--muted-2); border: 1px solid var(--border); padding: 1px 7px; border-radius: 100px; }
+  .rank-row .desc { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  /* ---------- Technique cards ---------- */
+  .tech-toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; align-items: center; }
+  .search {
+    flex: 1; min-width: 220px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: 12px; padding: 11px 15px;
+  }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 14.5px; font-family: inherit; }
+  .search input::placeholder { color: var(--muted-2); }
+  .search svg { flex-shrink: 0; opacity: 0.6; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-size: 13px; padding: 9px 15px; border-radius: 100px; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    transition: all 0.16s; font-weight: 500; white-space: nowrap;
+  }
+  .chip:hover { color: var(--text); border-color: var(--border-strong); }
+  .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #06070d; border-color: transparent; font-weight: 600; }
+
+  .tech-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .tech {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .tech:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow); }
+  .tech-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .tech-top h3 { font-size: 19px; }
+  .tech .num-badge { font-family: 'Space Grotesk'; font-weight: 700; font-size: 12px; color: var(--accent); opacity: 0.7; }
+  .pill { font-size: 11px; padding: 4px 10px; border-radius: 100px; font-weight: 600; letter-spacing: 0.4px; white-space: nowrap; }
+  .pill.fast { background: rgba(110,168,255,0.15); color: var(--accent); border: 1px solid rgba(110,168,255,0.3); }
+  .pill.slow { background: rgba(192,139,255,0.15); color: var(--accent-2); border: 1px solid rgba(192,139,255,0.3); }
+  .pill.spin { background: rgba(255,184,107,0.15); color: var(--accent-3); border: 1px solid rgba(255,184,107,0.3); }
+  .pill.any { background: rgba(150,154,181,0.15); color: var(--muted); border: 1px solid var(--border-strong); }
+  .tech .blurb { color: var(--muted); font-size: 14px; }
+  .tech .why { color: var(--muted-2); font-size: 13px; margin-top: 8px; font-style: italic; }
+
+  .bars { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 38px; gap: 10px; align-items: center; font-size: 12.5px; }
+  .bar-row .bl { color: var(--muted); }
+  .track { height: 7px; background: rgba(120,130,180,0.12); border-radius: 100px; overflow: hidden; }
+  .fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.9s cubic-bezier(.2,.8,.2,1); width: 0; }
+  .fill.cm { background: linear-gradient(90deg, var(--good), #22c55e); }
+  .fill.no { background: linear-gradient(90deg, var(--bad), #ef4444); }
+  .bar-row .bv { text-align: right; font-family: 'Space Grotesk'; font-weight: 600; color: var(--text); }
+
+  .howto {
+    margin-top: 16px; padding: 13px 15px; border-radius: var(--radius-sm);
+    background: rgba(6,7,13,0.5); border: 1px solid var(--border);
+    font-size: 13.5px; color: var(--muted);
+  }
+  .howto b { color: var(--accent); font-family: 'Space Grotesk'; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+
+  .empty { text-align: center; color: var(--muted); padding: 40px; grid-column: 1/-1; }
+
+  /* ---------- Player / clan cards ---------- */
+  .person {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+  }
+  .person::after { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); opacity: 0; transition: opacity 0.2s; }
+  .person:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow); }
+  .person:hover::after { opacity: 1; }
+  .person .ptop { display: flex; align-items: center; gap: 13px; margin-bottom: 12px; }
+  .avatar {
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    display: grid; place-items: center; font-family: 'Space Grotesk'; font-weight: 700; font-size: 18px;
+    background: linear-gradient(135deg, var(--av1, var(--accent)), var(--av2, var(--accent-2)));
+    color: #06070d;
+  }
+  .person .pname { font-family: 'Space Grotesk'; font-weight: 600; font-size: 16px; }
+  .person .prank { font-size: 12px; color: var(--accent); font-weight: 500; }
+  .person .pbody { color: var(--muted); font-size: 14px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .tag-s { font-size: 11px; padding: 3px 9px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); }
+  .tag-s.active { color: var(--good); border-color: rgba(74,222,128,0.4); background: rgba(74,222,128,0.1); }
+  .tag-s.retired { color: var(--muted-2); }
+  .tag-s.cheat { color: var(--bad); border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); }
+
+  /* ---------- Timeline ---------- */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(180deg, var(--accent), var(--accent-2), transparent); }
+  .tl-item { position: relative; padding-bottom: 26px; }
+  .tl-item::before { content: ""; position: absolute; left: -28px; top: 5px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); }
+  .tl-item h4 { font-size: 16px; margin-bottom: 4px; }
+  .tl-item p { color: var(--muted); font-size: 14px; }
+
+  /* ---------- Disclaimer / footer ---------- */
+  .note {
+    background: linear-gradient(135deg, rgba(110,168,255,0.08), rgba(192,139,255,0.06));
+    border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 22px 24px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .note .ni { font-size: 24px; }
+  .note h4 { font-size: 15px; margin-bottom: 4px; }
+  .note p { color: var(--muted); font-size: 13.5px; }
+
+  footer { border-top: 1px solid var(--border); margin-top: 80px; padding: 40px 0 60px; }
+  .foot-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; align-items: center; color: var(--muted); font-size: 13px; }
+
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    nav.links { display: none; }
+    nav.links.open {
+      display: flex; flex-direction: column; position: absolute; top: 66px; right: 16px; left: 16px;
+      background: var(--surface-solid); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 10px; gap: 2px;
+    }
+    nav.links.open a { padding: 12px 14px; }
+    .menu-btn { display: block; }
+    .cols-2, .cols-3, .tech-grid { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .rank-row { grid-template-columns: 90px 1fr; }
+    .bar-row { grid-template-columns: 110px 1fr 34px; }
   }
 </style>
 </head>
 <body>
 
-<div class="noise-overlay"></div>
+<div class="aurora"></div>
+<div class="grid-overlay"></div>
 
-<nav>
-  <div class="nav-logo">AI Assistant</div>
-  <div class="nav-status">
-    <div class="dot"></div>
-    <span>CONNECTED</span>
+<header>
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <span class="mark">F</span>
+      <span>FTAP Codex<small>FLING THINGS &amp; PEOPLE</small></span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+    <nav class="links" id="navLinks">
+      <a href="#mechanics">Mechanics</a>
+      <a href="#ranks">Ranks</a>
+      <a href="#techniques">Techniques</a>
+      <a href="#playstyles">Playstyles</a>
+      <a href="#gods">Fling Gods</a>
+      <a href="#players">Players</a>
+      <a href="#clans">Clans</a>
+      <a href="#history">History</a>
+    </nav>
   </div>
-</nav>
+</header>
 
-<div class="chat-container">
-  <div class="chat-messages" id="chatMessages">
-    <div class="welcome" id="welcomeBox">
-      <div class="welcome-logo">How can I help you today?</div>
-      <div class="welcome-sub">Ask any question, brainstorm ideas, or just chat with the AI assistant.</div>
+<a id="top"></a>
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="tag"><span class="pulse"></span> Unofficial field guide · Roblox</div>
+    <h1>The <span class="grad">FTAP</span><br>Codex</h1>
+    <p class="lede">Everything that actually matters in <strong>Fling Things And People</strong> — the ranks, the movement, the clutches, and the techniques that separate casuals from fling gods.</p>
+    <div class="hero-cta">
+      <a href="#techniques" class="btn btn-primary">Explore techniques →</a>
+      <a href="#mechanics" class="btn btn-ghost">Learn the basics</a>
     </div>
-  </div>
-
-  <div class="input-area">
-    <div class="input-row">
-      <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
-      <button class="send" id="sendBtn" onclick="sendMessage()">Send</button>
+    <div class="stats-strip">
+      <div><div class="num">6</div><div class="lbl">Ranks</div></div>
+      <div><div class="num">12</div><div class="lbl">Techniques</div></div>
+      <div><div class="num">30</div><div class="lbl">Stud reach</div></div>
+      <div><div class="num">5</div><div class="lbl">Fling gods</div></div>
     </div>
+  </section>
+
+  <!-- MECHANICS -->
+  <section id="mechanics">
+    <div class="section-head reveal">
+      <span class="eyebrow">Core mechanics</span>
+      <h2>How the game actually works</h2>
+      <p>None of this is "built in" — flinging, movement and clutching were all discovered and refined by players. Aiming is proximity based with a hard 30-stud reach.</p>
+    </div>
+    <div class="grid cols-3" id="mechGrid"></div>
+  </section>
+
+  <!-- MOVEMENT + AG -->
+  <section id="movement">
+    <div class="grid cols-2">
+      <div class="card reveal">
+        <span class="icon">🎯</span>
+        <h3>Movement</h3>
+        <p>Think of a Garry's Mod physics gun aimed at your pallet — it has a 30-stud range, which doubles as your grab range. Scroll out to fly faster and grab further back (less control), or grab high and scroll less for tight control. Looking down and scrolling out is the <strong>dive</strong>. There is <strong>no</strong> built-in dashing or bunny-hopping — every bit of movement is player-made.</p>
+      </div>
+      <div class="card reveal">
+        <span class="icon">⛔</span>
+        <h3>AG — Anti-Grab</h3>
+        <p>A distance check written by the dev <strong>horomori</strong> to kill infinite-reach exploits. When someone moves too fast on high ping, the grab gets <strong>cancelled</strong> — brutal after you fought for it. It triggers on dash-backs and dives into a rush, and it's exactly why <strong>rupasu</strong> is so deadly: rushing him hands you an AG while he calmly stops and grabs you.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLUTCHING -->
+  <section id="clutching">
+    <div class="section-head reveal">
+      <span class="eyebrow">Survival</span>
+      <h2>Clutching &amp; counters</h2>
+      <p>FTAP's most unfair mechanic. It's heavily ping-based — the lower your ping, the more outs you have when you get flung.</p>
+    </div>
+    <div class="grid cols-2" id="clutchGrid"></div>
+  </section>
+
+  <!-- RANKS -->
+  <section id="ranks">
+    <div class="section-head reveal">
+      <span class="eyebrow">The ladder</span>
+      <h2>Rank hierarchy</h2>
+      <p>From flightless casuals to the untouchable fling gods. Most ranks use tiers <strong>I–III</strong> (1-2-3), each further split low / mid / high. Casual is the most common rank overall; skillful is the most common for competitive players.</p>
+    </div>
+    <div class="ladder" id="ranksList"></div>
+  </section>
+
+  <!-- TECHNIQUES -->
+  <section id="techniques">
+    <div class="section-head reveal">
+      <span class="eyebrow">Advanced tech · "Cool Method"</span>
+      <h2>Techniques &amp; chaining</h2>
+      <p>The real depth of FTAP. "CM" = the Cool Method — most of these become viable, consistent, or downright unfair once it's in play. Each card rates <strong>possibility</strong> (can it be done) and <strong>practicality</strong> (is it worth doing) with and without CM.</p>
+    </div>
+    <div class="tech-toolbar reveal">
+      <label class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="techSearch" placeholder="Search techniques…">
+      </label>
+      <div class="filters" id="techFilters"></div>
+    </div>
+    <div class="tech-grid" id="techGrid"></div>
+  </section>
+
+  <!-- PLAYSTYLES -->
+  <section id="playstyles">
+    <div class="section-head reveal">
+      <span class="eyebrow">Identity</span>
+      <h2>Playstyles</h2>
+      <p>Everything branches off the fast / slow split. The base everyone starts from is grabbing center-mass and moving left and right — pure foundation, no depth.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="card reveal">
+        <h3 style="color:var(--accent)">⚡ Fast archetypes</h3>
+        <div id="fastList"></div>
+      </div>
+      <div class="card reveal">
+        <h3 style="color:var(--accent-2)">🪨 Slow archetypes</h3>
+        <div id="slowList"></div>
+      </div>
+    </div>
+    <div class="note reveal" style="margin-top:18px">
+      <span class="ni">🧠</span>
+      <div>
+        <h4>How to beat a slow player</h4>
+        <p>You can't rush them straight up — that's exactly what they want. Bait the dive, rush in, make them commit to the dodge, then <strong>you</strong> stop rushing and dive yourself to break their timing and grab them while they reset. Against rupasu specifically, even this barely works.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLING GODS -->
+  <section id="gods">
+    <div class="section-head reveal">
+      <span class="eyebrow">Legends</span>
+      <h2>Fling gods</h2>
+      <p>The rarest rank — only the most notable of the notable. All of them stopped playing 1–2 years ago; ranks shown are their peaks.</p>
+    </div>
+    <div class="grid cols-2" id="godsGrid"></div>
+  </section>
+
+  <!-- PLAYERS -->
+  <section id="players">
+    <div class="section-head reveal">
+      <span class="eyebrow">The scene</span>
+      <h2>Remarkable players</h2>
+      <p>Hand-picked for playing in a way that's genuinely their own — for better or worse. Filter by status, and search names or playstyles.</p>
+    </div>
+    <div class="tech-toolbar reveal">
+      <label class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="playerSearch" placeholder="Search players…">
+      </label>
+      <div class="filters" id="playerFilters"></div>
+    </div>
+    <div class="grid cols-3" id="playersGrid"></div>
+  </section>
+
+  <!-- CLANS -->
+  <section id="clans">
+    <div class="section-head reveal">
+      <span class="eyebrow">Factions</span>
+      <h2>Clans</h2>
+      <p>Not official parts of the game — just groups banded together in Discord to back each other up in 2v1s and 3v1s, form alliances, and wage wars.</p>
+    </div>
+    <div class="grid cols-3" id="clansGrid"></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history">
+    <div class="section-head reveal">
+      <span class="eyebrow">Lore</span>
+      <h2>Ranking history</h2>
+      <p>How official ranking rose, fell, and devolved into everyone ranking everyone.</p>
+    </div>
+    <div class="timeline reveal" id="historyTl"></div>
+  </section>
+
+  <!-- DISCLAIMER -->
+  <section>
+    <div class="note reveal">
+      <span class="ni">⚠️</span>
+      <div>
+        <h4>Unofficial &amp; community-sourced</h4>
+        <p>This guide is a fan-made reference built from community knowledge. Ranks, player statuses and "advanced" techniques are debated and change over time — treat anything marked unconfirmed as exactly that. FTAP and all trademarks belong to their respective owners.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <div class="brand"><span class="mark">F</span><span>FTAP Codex</span></div>
+    <div>Built for the fling community · Not affiliated with Roblox or the game's developers.</div>
   </div>
-</div>
+</footer>
 
 <script>
-const CONFIG = {
-  endpoint: "https://api.blackbox.ai/v1/chat/completions",
-  model: "blackboxai",
-  apiKey: "sk-proj-S6hK4R8P1mLoG5jY3tW2B9qF7nX5v8c2D1e0Z4r3x7
+/* ----------------------------- DATA ----------------------------- */
+const mechanics = [
+  { icon: "🌀", title: "Flinging", body: "Not a built-in mechanic — discovered naturally. Grab your opponent, drag them into the floor to ragdoll (more consistent, harder to clutch), then look behind you and fling them low (but not ground-low) so they can't clutch. It's all in a quick flick." },
+  { icon: "💫", title: "Ragdolling", body: "Often overlooked. It just happens whenever you grab someone at decent speed — basically any air-to-air fight. A ragdolled player can only inch slowly in any direction." },
+  { icon: "🛡️", title: "Surviving a fling", body: "Flung players can barely steer unless they're not ragdolled. Most hold S to drift back and face the throw direction to lessen the fling. Below ~2k ping it barely matters." },
+  { icon: "🎯", title: "Aiming", body: "Like an FPS, but players move so fast that timing matters as much as — or more than — aim. Proximity based, with a hard 30-stud reach. No cross-map grabs." },
+  { icon: "📏", title: "30-stud reach", body: "Your grab range and your pallet's physics-gun range are one and the same: 30 studs. Everything about positioning revolves around this number." },
+  { icon: "🤝", title: "Player-made depth", body: "There are no game modes, no dashing, no bunny-hopping. Every technique in this codex was invented and refined by the community on top of raw physics." },
+];
+
+const clutching = [
+  { icon: "🪂", title: "Double-pallet clutch", body: "Sub-100 ping players look down mid-fling, spawn a pallet beneath them, jump on it for height, then spawn and grab another normally. Normal-ping players simply can't do this — which makes it deeply unfair." },
+  { icon: "🌊", title: "Dunking", body: "Throwing in a downward manner. Eliminates basically every clutch except tabbing and maybe shuriken — but it needs water below, and most fight spots only have it on one side." },
+  { icon: "🪟", title: "Tabbing", body: "Holding right-click on the Roblox window freezes the game, bugs FTAP out, and warps you to the nearest solid floor. A heavily frowned-upon exploit." },
+  { icon: "🌟", title: "Shuriken", body: "Spawn a shuriken under you so it sticks (it's a sticky item). When you get flung it stays just below you — look down, grab it, and it's a double-pallet clutch on steroids." },
+];
+
+const ranks = [
+  { abbr: "Casual", name: "Casual", tiers: "No tiers", color: "#8b90a8", desc: "Worst rank. Can fling, can barely fly, usually stuck on the ground and can't aim." },
+  { abbr: "App", name: "Apprentice", tiers: "low · mid · high", color: "#4ade80", desc: "Much better. Can fly and usually grab easy face-to-face grabs. Some show skillful-level movement." },
+  { abbr: "Sk I–III", name: "Skillful", tiers: "I · II · III", color: "#6ea8ff", desc: "Where people start getting good and the most common competitive rank. Sk1s fly without falling, nail easy grabs, and juke by switching directions fast." },
+  { abbr: "Exp I–III", name: "Expert", tiers: "I · II · III", color: "#c08bff", desc: "Genuinely good — at movement OR aim, often both. Almost always grab, usually the best in the server. Range from pure aimers to pure movement." },
+  { abbr: "Adv I–III", name: "Advanced", tiers: "I · II · III", color: "#ffb86b", desc: "Nearly unheard of. Almost always great at both aim and movement. Adv1s are rare; real Adv2/3s barely exist (mostly overranked or cheaters)." },
+  { abbr: "FG", name: "Fling God", tiers: "Levels, no tiers", color: "#ff6b9d", desc: "The rarest rank in the game. Reserved for the most notable of the notable." },
+];
+
+const techniques = [
+  { n:1, name:"Stutter-step", style:"fast", styleLabel:"Fast", blurb:"Go any speed, look down, scroll back slightly and double-click the pallet to reset almost all your speed. Chains lethally with drag-backs.", why:"Fast styles are predictable — stopping dead breaks your opponent's rhythm completely.", cmP:90, noP:60, cmPr:80, noPr:10, how:"Move normally but look down at your pallet; while flicking downward press your cool-bind, then LMB the pallet." },
+  { n:2, name:"Pallet resetting", style:"fast", styleLabel:"Fast", blurb:"Look at the pallet and double-click it. Mastered, it gives sub-20ms direction switching and slightly changes elevation.", why:"Switch directions so fast the opponent loses track of you, then grab while they're not even looking.", cmP:70, noP:20, cmPr:80, noPr:10, how:"While moving, look fully down, do a 180 flick while pressing the cool-bind, and LMB the pallet." },
+  { n:3, name:"Instant grabbing", style:"spin", styleLabel:"Spin / Track", blurb:"Hover crosshair over an opponent mid-fight and double-click / CM them. Looks insane from both POVs and chains brutally.", why:"Track-heavy styles aim with movement and fire the input whenever — pairing perfectly with insta-grabs.", cmP:90, noP:20, cmPr:100, noPr:30, how:"Hover your crosshair over the opponent, LMB then cool-bind (or vice-versa) with a slight delay for FTAP/Roblox ticks." },
+  { n:4, name:"AG bypassing", style:"slow", styleLabel:"Slow", blurb:"Triple-click an opponent: grab, get AG'd, grab again, then a third to solidify it. You're tripling your odds against the distance-check.", why:"Heavily unexplored — so far only rensupercool can do it, and only at slower speeds.", cmP:20, noP:0, cmPr:40, noPr:0, how:"Triple-click then a double-binded CM to grab thrice, or single-click then double-CM to grab twice. Partly up to chance." },
+  { n:5, name:"Pallet tapping", style:"fast", styleLabel:"Unpredictable", blurb:"Full-rush early so they feel safe, then 'tap' the pallet with a double-click. Delay length wildly changes the pause — long delay = big stop, short = ~20ms hitch.", why:"Surprise them by using it, then surprise them by NOT using it once they expect the spam.", cmP:80, noP:60, cmPr:60, noPr:20, how:"Rush and release the pallet way too early; as you close in, click the pallet twice with a deliberately long delay." },
+  { n:6, name:"Pallet flicking", style:"slow", styleLabel:"Slow", blurb:"Flick while still grabbing your pallet and tap cool-bind + mouse together to grab someone without ever letting go. Possibly the future — but impractical fast.", why:"Slow play removes the timing difficulty and the punishment for a miss.", cmP:70, noP:0, cmPr:60, noPr:0, how:"Keep the pallet grabbed at all times, flick fast while grabbing, and do a (double) CM grab. Smaller flicks & slower speeds are far more consistent — looks like s-aim, so expect accusations." },
+  { n:7, name:"Insta diving", style:"fast", styleLabel:"Fast", blurb:"Dive, then pallet-reset to wipe your momentum so you can immediately rush without falling. On high FPS this could be the fast meta.", why:"Breaks rhythm AND changes elevation so you can't be grabbed — plus the reset lets you rush instantly after.", cmP:100, noP:20, cmPr:80, noPr:10, how:"Dive as normal; as you look down and scroll, wait until your speed peaks then pallet-reset. Reset earlier for a shorter, faster dive." },
+  { n:8, name:"Scroll faking", style:"fast", styleLabel:"Fast · Unconfirmed", blurb:"Flick fast enough while scrolling and you can glitch the opponent's POV to show you looking and max-scrolled while not moving — physically impossible.", why:"Almost entirely unexplored — likely ping & RNG, probably can't be mastered.", cmP:10, noP:5, cmPr:10, noPr:5, how:"Only ever pulled off once on a private server. Flick + scroll with the bind set to max speed. Highly inconsistent." },
+  { n:9, name:"Throw resetting", style:"spin", styleLabel:"Spin", blurb:"A weaker pallet-reset using the throw (RMB). Slightly changes elevation; thanks to the throw mechanic the pallet always falls downward regardless of speed.", why:"Only really works for spin styles — swapping counter-to-clockwise keeps the pallet visible the whole time.", cmP:70, noP:70, cmPr:10, noPr:10, how:"Rotate the pallet so you can still move while it's on your crosshair, then throw to reset. CM not applicable. Mainly useful if CM ever gets banned." },
+  { n:10, name:"Stunning", style:"fast", styleLabel:"Fast", blurb:"Insta-grab the opponent's pallet so they're forced to look down and re-grab — handing you a free grab. Without CM you grab slower and scroll back to finish.", why:"Spammable in a miss-heavy style; constantly forcing them to look down is infuriating to fight.", cmP:100, noP:100, cmPr:70, noPr:50, how:"Grab their pallet to force the look-down; on CM it's instant, without it scroll back into the grab afterwards." },
+  { n:11, name:"Player clutching", style:"any", styleLabel:"Any (favors slow)", blurb:"Double-click your opponent while you're both grabbing each other to clutch with their body. Nearly impossible to be grabbed back, and mastered it works every time.", why:"Favors slower players since they get grabbed more and prioritize survival.", cmP:100, noP:50, cmPr:90, noPr:40, how:"While locked in a mutual grab, double-click / CM the opponent to clutch off their body instead of a pallet." },
+  { n:12, name:"Pre-strafing", style:"spin", styleLabel:"Fast · Spin", blurb:"Strafe toward the direction you want before you commit — e.g. hold A before spinning counter-clockwise. Hugely boosts control and unlocks otherwise-impossible actions.", why:"Fast players use it to carve turns; spin players use it to spin far easier and faster.", cmP:100, noP:100, cmPr:90, noPr:80, how:"Begin holding the strafe key in your intended direction a beat before executing the turn or spin." },
+];
+
+const fastStyles = [
+  { name:"High FPS", body:"In FTAP, FPS = speed. 1k+ FPS players (vs the usual sub-200) get a massive speed and control boost — they spam the dive and can stop on a dime. Considered unfair pay-to-win by those who know, with zero downsides." },
+  { name:"Aggressive-fast", body:"Decent aimers who spam rushes and rarely do anything fancy. Pure pressure." },
+  { name:"Controlled-fast", body:"LostNPC's style — any move can be added and it still flows naturally. Players like this rarely leave the Expert 2 mark, with a few exceptions." },
+];
+const slowStyles = [
+  { name:"Very slow", body:"Players like chamo who rarely do anything but the dive. Rush them and you get grabbed — they dash back and grab YOU." },
+  { name:"Hybrid-slow", body:"Usually not actually slow players; they convert to slow only when you rush them or make a mistake (slower = more reaction time)." },
+  { name:"Elite slow", body:"Rupasu's style and the most elite type. Rush them and they'll dive AND grab you while going down (unheard of). Beating them is all about tricking the timing." },
+];
+
+const gods = [
+  { name:"pastdoa / futurekiddo", short:"FU", rank:"Fling God", av:["#6ea8ff","#c08bff"], body:"Referred to as 'future'. The most outstanding fling god — so jukey he left people in awe trying to copy him. No set playstyle; he adapts to whoever he fights. Against slow players he spins around and goes under to break their aim, then grabs." },
+  { name:"spence", short:"SP", rank:"Fling God · #1", av:["#ffb86b","#ff6b9d"], body:"Hailed as the #1 of the game. Once insanely fast on dives, later transitioned to a slow, aim-heavy style that inspired chamo. Went on to run Fling Syndicate before abandoning it." },
+  { name:"LostNPC", short:"LN", rank:"Fling God", av:["#4ade80","#6ea8ff"], body:"Fast and controlled (mid pallet grab, high scroll). Insanely consistent — rarely below Expert 2 and back within days. Amazing aim, hailed top 1 after the big dogs retired. Taught by zerogath." },
+  { name:"zerogath", short:"ZG", rank:"Fling God", av:["#c08bff","#ffb86b"], body:"THAT guy. Created the ranks (unconfirmed) and a first fling god alongside spence — LostNPC says he was the better of the two. Invented the basic left-right movement style, later refined with the dive. Now around Skillful 2-3 but with unmatched experience. Ran both Fling Enthusiasts and Fling Syndicate." },
+  { name:"rainz", short:"RZ", rank:"Fling God", av:["#6ea8ff","#4ade80"], body:"Known for grabbing the pallet and THROWING it, again and again, to get fully behind his opponent. Pallet throwing is semi-unheard-of and he's one of the only players known for it." },
+];
+
+const players = [
+  { name:"spiritsweat", short:"SS", rank:"Expert 3", status:"active", styles:["fast","high-fps"], body:"Very high-FPS dive-spammer with unmatched speed. Suspected triggerbot, admitted to movement scripts — not banned (weak anti-cheat) and not widely hated.", flags:["High FPS"] },
+  { name:"spaze", short:"SZ", rank:"Skillful 3", status:"retired", styles:["high-ping"], body:"Reached Sk3 on 300+ ping, playing since 2023. Unique for staying decent at very high ping." },
+  { name:"rupasu", short:"RU", rank:"Advanced 2", status:"retired", styles:["slow","elite-slow"], body:"Adv1 high to Adv2 on a good day. Baits AGs by making you rush then dragging back, or dives under and grabs (extremely hard). Unmatched aim. A former fast Adv1 who went slow after chamo. Reached advanced shockingly fast before retiring early — and doesn't realize he's one of the best in the world.", flags:["Best aim"] },
+  { name:"chamo", short:"CH", rank:"Advanced 3*", status:"retired", styles:["slow","very-slow"], body:"Unremarkable Sk1 in zerogath's era, then took spence as his idol and copied everything, rising to Adv3 (many argue Exp3 / overranked). Sparked the slow-player revolution and pushed rupasu to switch to slow. Player since 2022-23.", flags:["Started slow meta"] },
+  { name:"drey_man", short:"DM", rank:"Advanced 1", status:"retired", styles:["fast","dive"], body:"Trained by chamo to Adv1. Very good aim, dive-heavy movement to dodge and grab. Some sources say Adv2 (unconfirmed). Player since 2023-24." },
+  { name:"KL_Cabs", short:"KC", rank:"Skillful 1", status:"active", styles:["basic","high-ping"], body:"Leader of the KL clan, currently Sk1 from inactivity drop (peak Exp1). Known for building the FF:UT map (zerogath's improved FTAP). Plays super basic, often 300+ ping. Player since 2021.", flags:["FF:UT builder"] },
+  { name:"markakela_AS", short:"MA", rank:"Advanced 2", status:"inactive", styles:["aggressive-fast"], body:"Leader of the AS clan. Some say fling god, most disagree. Tried building his own ranking forum (FF — Fling Forum) but most think the ranks are inaccurate, so it never grew. Player since 2021-22." },
+  { name:"verlxren_UE", short:"VX", rank:"Advanced 3", status:"unknown", styles:["aggressive-fast"], body:"Goes by many usernames. Supposed Adv3, aggressive-fast — very fast and flick-heavy, regarded as fling god by some. Different region, limited info. Player since 2022-23." },
+  { name:"slatt_JBLxUE", short:"SL", rank:"Advanced 1", status:"retired", styles:["aggressive-fast"], body:"Well-known strong player, aggressive-fast, around Adv1 (claims Adv3 when playing effectively). High in JBL and leader of UE." },
+  { name:"crisila_TCU", short:"CR", rank:"Skillful 2", status:"active", styles:["cheater"], body:"Known for all the bad reasons. Claims Adv1 / fling god, but is actually Sk2. Known cheater and sore loser, leads the TCU cheat clan and encourages hate and toxicity.", flags:["Overranked"] },
+  { name:"qevus", short:"QV", rank:"Expert 3", status:"inactive", styles:["dev"], body:"Mainly a developer for FF:UT. Former Exp3, known for being toxic — and for eating a 10-0 from spence." },
+  { name:"J_husky01", short:"JH", rank:"—", status:"retired", styles:["basic","fast"], body:"Solid player with a basic style and great aim. Had a massive transformation in FF:UT into a very fast player with insane aim. Different region, limited info." },
+  { name:"cheesman", short:"CM", rank:"Advanced 3*", status:"retired", styles:["slow"], body:"Supposed Adv3, but lost to many Exp3s and had close matches with chamo. Slow with great aim. Different region, limited info." },
+  { name:"minzo", short:"MZ", rank:"Advanced 2", status:"retired", styles:["fast"], body:"Fast player with great aim, former Adv2 who lost most of his skill. Similar in style to LostNPC. Only one encounter, limited info." },
+  { name:"Fahrenheit", short:"FH", rank:"Advanced 1*", status:"retired", styles:["aggressive-fast"], body:"Created the IVC clan (with Surf). Fast, aggressive, rush-heavy. Once called 'the best ranker' — ironically inaccurate. Ranked Adv1 but most say Exp2." },
+  { name:"Surf", short:"SU", rank:"Expert 3*", status:"retired", styles:["spin"], body:"Co-created the IVC clan. Unique spin style — circles people and grabs from behind. Stated Exp3 but actually around Exp1." },
+];
+
+const clans = [
+  { name:"GEM", color:["#6ea8ff","#c08bff"], status:"dead", body:"Group of Elite players (Adv+) led by zerogath, banded by future. Few members but huge names: LostNPC, zerogath, futurekiddo, spence, chamo, drey_man, J_husky01, qevus, rensupercool. All advanced except qevus (a dev)." },
+  { name:"IVC", color:["#4ade80","#6ea8ff"], status:"dead", body:"Expert-3-and-up only. Big roster: chamo, cheesman, drey_man, minzo and more. Led by Fahrenheit (supposed Adv1, most say Exp2)." },
+  { name:"KL", color:["#ffb86b","#ff6b9d"], status:"inactive", body:"Current #1 FF:UT clan — lots of smart influence-farmers plus big names: chamo, rupasu, drey_man, zerogath, Fahrenheit. Alive but inactive." },
+  { name:"JBL", color:["#c08bff","#6ea8ff"], status:"alive", body:"Very large, long-standing clan since 2022. Few mega names beyond slatt — though LostNPC was in it briefly on an alt named waytoobuh." },
+  { name:"UE", color:["#6ea8ff","#4ade80"], status:"inactive", body:"Small clan of great players gathered by slatt, including verlxren. Inactive, and only accepts players slatt personally approves." },
+  { name:"AS", color:["#ffb86b","#c08bff"], status:"alive", body:"Russian-only clan, mostly aggressive-fast players who band together for group fights and FFAs." },
+  { name:"TCU", color:["#f87171","#ffb86b"], status:"alive", body:"A clan of cheaters and overranked members with a poor reputation. Lost a war to KL but claimed they won. Known for aimbot and tabbing." },
+  { name:"WDG", color:["#6b6f8a","#969ab5"], status:"dying", body:"A Russian clan known mostly for cheaters and highly-ranked bad players. Frequently clowned on and used as a joke." },
+];
+
+const history = [
+  { title:"Fling Enthusiasts", body:"The original community ranking server, run by its creator zerogath. Ranks here were 100% trusted because zerogath ranked you himself." },
+  { title:"Fling Syndicate", body:"The successor server. zerogath controlled it briefly then handed it to spence. Ranks shifted to high-skill players rather than zerogath — still ~90% reliable." },
+  { title:"The collapse (2024)", body:"Fling Syndicate was abandoned by spence. Since 2024 there have been no official ranking servers at all." },
+  { title:"The wild west", body:"Known players started ranking on their own — some good, some bad — until it devolved into everyone ranking everyone, even apprentices." },
+  { title:"Today", body:"Trusted rankers are just known players or genuine Expert-2-and-up. Plenty of overrankers remain, with whole clans (TCU, WDG, random Russian clans) known for inaccurate ranks." },
+];
+
+/* ----------------------------- RENDER ----------------------------- */
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const $ = (id) => document.getElementById(id);
+
+// Mechanics
+mechanics.forEach(m => {
+  const c = el("div", "card reveal");
+  c.innerHTML = `<span class="icon">${m.icon}</span><h3>${m.title}</h3><p>${m.body}</p>`;
+  $("mechGrid").appendChild(c);
+});
+
+// Clutching
+clutching.forEach(m => {
+  const c = el("div", "card reveal");
+  c.innerHTML = `<span class="icon">${m.icon}</span><h3>${m.title}</h3><p>${m.body}</p>`;
+  $("clutchGrid").appendChild(c);
+});
+
+// Ranks
+ranks.forEach(r => {
+  const row = el("div", "rank-row reveal");
+  row.style.setProperty("--rc", r.color);
+  row.innerHTML = `
+    <div class="rank-badge">${r.abbr}</div>
+    <div>
+      <div class="meta"><strong>${r.name}</strong><span class="tier">${r.tiers}</span></div>
+      <div class="desc">${r.desc}</div>
+    </div>`;
+  $("ranksList").appendChild(row);
+});
+
+// Techniques
+const styleClass = { fast:"fast", slow:"slow", spin:"spin", any:"any" };
+function renderTech(list) {
+  const grid = $("techGrid");
+  grid.innerHTML = "";
+  if (!list.length) { grid.appendChild(el("div", "empty", "No techniques match your search.")); return; }
+  list.forEach(t => {
+    const card = el("div", "tech reveal in");
+    card.innerHTML = `
+      <div class="tech-top">
+        <div><span class="num-badge">CM #${t.n}</span><h3>${t.name}</h3></div>
+        <span class="pill ${styleClass[t.style]}">${t.styleLabel}</span>
+      </div>
+      <p class="blurb">${t.blurb}</p>
+      <p class="why">Why: ${t.why}</p>
+      <div class="bars">
+        ${barRow("Possibility · CM", t.cmP, "cm")}
+        ${barRow("Possibility · no CM", t.noP, "no")}
+        ${barRow("Practicality · CM", t.cmPr, "cm")}
+        ${barRow("Practicality · no CM", t.noPr, "no")}
+      </div>
+      <div class="howto"><b>How to</b>${t.how}</div>`;
+    grid.appendChild(card);
+  });
+  requestAnimationFrame(() => grid.querySelectorAll(".fill").forEach(f => f.style.width = f.dataset.w + "%"));
+}
+function barRow(label, val, cls) {
+  return `<div class="bar-row"><span class="bl">${label}</span><div class="track"><div class="fill ${cls}" data-w="${val}"></div></div><span class="bv">${val}%</span></div>`;
+}
+// Technique filters
+const techCats = [
+  { key:"all", label:"All" },
+  { key:"fast", label:"⚡ Fast" },
+  { key:"slow", label:"🪨 Slow" },
+  { key:"spin", label:"🌀 Spin" },
+  { key:"any", label:"Any" },
+];
+let techFilter = "all";
+techCats.forEach((c, i) => {
+  const chip = el("button", "chip" + (i === 0 ? " active" : ""), c.label);
+  chip.onclick = () => { techFilter = c.key; document.querySelectorAll("#techFilters .chip").forEach(x => x.classList.remove("active")); chip.classList.add("active"); applyTech(); };
+  $("techFilters").appendChild(chip);
+});
+function applyTech() {
+  const q = $("techSearch").value.toLowerCase();
+  renderTech(techniques.filter(t =>
+    (techFilter === "all" || t.style === techFilter) &&
+    (t.name.toLowerCase().includes(q) || t.blurb.toLowerCase().includes(q) || t.styleLabel.toLowerCase().includes(q))
+  ));
+}
+$("techSearch").addEventListener("input", applyTech);
+renderTech(techniques);
+
+// Playstyles
+fastStyles.forEach(s => $("fastList").appendChild(el("div", null, `<p style="margin-top:14px"><strong style="font-family:'Space Grotesk'">${s.name}</strong> — <span style="color:var(--muted)">${s.body}</span></p>`)));
+slowStyles.forEach(s => $("slowList").appendChild(el("div", null, `<p style="margin-top:14px"><strong style="font-family:'Space Grotesk'">${s.name}</strong> — <span style="color:var(--muted)">${s.body}</span></p>`)));
+
+// Fling gods
+gods.forEach(g => {
+  const c = el("div", "person reveal");
+  c.innerHTML = `
+    <div class="ptop">
+      <div class="avatar" style="--av1:${g.av[0]};--av2:${g.av[1]}">${g.short}</div>
+      <div><div class="pname">${g.name}</div><div class="prank">${g.rank}</div></div>
+    </div>
+    <p class="pbody">${g.body}</p>`;
+  $("godsGrid").appendChild(c);
+});
+
+// Players
+const avPalettes = [["#6ea8ff","#c08bff"],["#ffb86b","#ff6b9d"],["#4ade80","#6ea8ff"],["#c08bff","#ffb86b"],["#ff6b9d","#6ea8ff"],["#4ade80","#c08bff"]];
+function statusClass(s) { return s === "active" ? "active" : s === "retired" ? "retired" : s === "cheater" ? "cheat" : ""; }
+function renderPlayers(list) {
+  const grid = $("playersGrid"); grid.innerHTML = "";
+  if (!list.length) { grid.appendChild(el("div", "empty", "No players match.")); return; }
+  list.forEach((p, i) => {
+    const av = avPalettes[i % avPalettes.length];
+    const c = el("div", "person reveal in");
+    const flagBadges = (p.flags || []).map(f => `<span class="tag-s">${f}</span>`).join("");
+    const statusBadge = `<span class="tag-s ${statusClass(p.status)}">● ${p.status}</span>`;
+    c.innerHTML = `
+      <div class="ptop">
+        <div class="avatar" style="--av1:${av[0]};--av2:${av[1]}">${p.short}</div>
+        <div><div class="pname">${p.name}</div><div class="prank">${p.rank}</div></div>
+      </div>
+      <p class="pbody">${p.body}</p>
+      <div class="badges">${statusBadge}${flagBadges}</div>`;
+    grid.appendChild(c);
+  });
+}
+const playerCats = [
+  { key:"all", label:"All" },
+  { key:"active", label:"● Active" },
+  { key:"retired", label:"● Retired" },
+  { key:"inactive", label:"● Inactive" },
+];
+let playerFilter = "all";
+playerCats.forEach((c, i) => {
+  const chip = el("button", "chip" + (i === 0 ? " active" : ""), c.label);
+  chip.onclick = () => { playerFilter = c.key; document.querySelectorAll("#playerFilters .chip").forEach(x => x.classList.remove("active")); chip.classList.add("active"); applyPlayers(); };
+  $("playerFilters").appendChild(chip);
+});
+function applyPlayers() {
+  const q = $("playerSearch").value.toLowerCase();
+  renderPlayers(players.filter(p =>
+    (playerFilter === "all" || p.status === playerFilter) &&
+    (p.name.toLowerCase().includes(q) || p.body.toLowerCase().includes(q) || (p.styles || []).join(" ").includes(q) || p.rank.toLowerCase().includes(q))
+  ));
+}
+$("playerSearch").addEventListener("input", applyPlayers);
+renderPlayers(players);
+
+// Clans
+const clanStatus = { dead:"retired", dying:"cheat", alive:"active", inactive:"" };
+clans.forEach(cl => {
+  const c = el("div", "person reveal");
+  c.innerHTML = `
+    <div class="ptop">
+      <div class="avatar" style="--av1:${cl.color[0]};--av2:${cl.color[1]}">${cl.name.slice(0,2)}</div>
+      <div><div class="pname">${cl.name}</div><div class="prank">Clan</div></div>
+    </div>
+    <p class="pbody">${cl.body}</p>
+    <div class="badges"><span class="tag-s ${clanStatus[cl.status]||""}">● ${cl.status}</span></div>`;
+  $("clansGrid").appendChild(c);
+});
+
+// History
+history.forEach(h => {
+  const c = el("div", "tl-item");
+  c.innerHTML = `<h4>${h.title}</h4><p>${h.body}</p>`;
+  $("historyTl").appendChild(c);
+});
+
+/* ----------------------------- INTERACTIONS ----------------------------- */
+// Mobile menu
+$("menuBtn").addEventListener("click", () => $("navLinks").classList.toggle("open"));
+document.querySelectorAll("#navLinks a").forEach(a => a.addEventListener("click", () => $("navLinks").classList.remove("open")));
+
+// Scroll reveal
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll(".reveal").forEach(r => io.observe(r));
+</script>
+</body>
+</html>
