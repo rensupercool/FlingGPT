@@ -3,16 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlingGPT</title>
+<title>AI Chat Assistant</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
   :root {
     --bg: #05060a;
-    --bg-alt: #070812;
     --surface: #0c0d18;
-    --surface-alt: #111322;
     --border: #1b1d32;
     --accent: #5b8cff;
     --accent-soft: rgba(91, 140, 255, 0.14);
@@ -22,7 +20,6 @@
     --user-bubble: #131528;
     --ai-bubble: #101222;
     --radius-lg: 18px;
-    --radius-sm: 10px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,85 +30,8 @@
     color: var(--text);
     font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height: 100vh;
-  }
-
-  /* global helpers */
-  .glass-card {
-    background: radial-gradient(circle at top, rgba(148, 163, 255, 0.18), rgba(15, 23, 42, 0.9));
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(148, 163, 255, 0.35);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-  }
-
-  .glass-soft {
-    background: rgba(15, 23, 42, 0.9);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(148, 163, 255, 0.22);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-  }
-
-  .glow-button {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .glow-button::before {
-    content: '';
-    position: absolute;
-    inset: -40%;
-    background: radial-gradient(circle at 10% 0, rgba(248, 250, 252, 0.08), transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .glow-button:hover::before {
-    opacity: 1;
-  }
-
-  .pulse-glow {
-    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.55);
-    animation: pulseGlow 2.6s infinite;
-  }
-
-  @keyframes pulseGlow {
-    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.55); }
-    70% { box-shadow: 0 0 0 20px rgba(139, 92, 246, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-  }
-
-  /* hero background blobs + particles */
-  .bg-blob {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(40px);
-    opacity: 0.75;
-    mix-blend-mode: screen;
-  }
-
-  .bg-blob-1 {
-    width: 420px;
-    height: 420px;
-    background: radial-gradient(circle at 30% 0, rgba(139, 92, 246, 0.9), transparent 60%);
-    top: -120px;
-    left: -40px;
-  }
-
-  .bg-blob-2 {
-    width: 520px;
-    height: 520px;
-    background: radial-gradient(circle at 70% 0, rgba(56, 189, 248, 0.75), transparent 65%);
-    top: -160px;
-    right: -60px;
-  }
-
-  .bg-blob-3 {
-    width: 520px;
-    height: 520px;
-    background: radial-gradient(circle at 20% 100%, rgba(248, 113, 113, 0.6), transparent 65%);
-    bottom: -220px;
-    left: 10%;
+    display: flex;
+    flex-direction: column;
   }
 
   .noise-overlay {
@@ -124,42 +44,6 @@
     z-index: 0;
   }
 
-  .particle-layer {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    opacity: 0.45;
-  }
-
-  .particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    border-radius: 999px;
-    background: rgba(148, 163, 255, 0.85);
-    animation: floatParticle linear infinite;
-  }
-
-  @keyframes floatParticle {
-    0% { transform: translate3d(0, 0, 0); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translate3d(0, -80px, 0); opacity: 0; }
-  }
-
-  /* scroll reveal */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-
-  .fade-up-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
   nav {
     display: flex;
     align-items: center;
@@ -169,41 +53,14 @@
     background: rgba(5, 6, 14, 0.96);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    flex-shrink: 0;
+    z-index: 10;
   }
 
   .nav-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 26px;
-    letter-spacing: 3px;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1px;
     color: #f5f5ff;
-    cursor: pointer;
-  }
-
-  .nav-links { display: flex; gap: 4px; margin-left: 32px; }
-
-  .nav-link {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 999px;
-    transition: color 0.15s ease, background 0.15s ease;
-  }
-
-  .nav-link:hover {
-    color: var(--text);
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .nav-link.active {
-    color: var(--accent);
-    background: var(--accent-soft);
   }
 
   .nav-status {
@@ -228,123 +85,19 @@
     50% { opacity: 0.2; }
   }
 
-  .page { display: none; flex: 1; overflow: hidden; flex-direction: column; }
-  .page.active { display: flex; }
-
-  /* ABOUT */
-  .about-page {
-    overflow-y: auto;
-    padding: 32px 24px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+  .chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
   }
-
-  .about-inner {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 24px 22px 32px;
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-  }
-
-  .about-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 40px;
-    letter-spacing: 4px;
-    line-height: 1;
-    color: #ffffff;
-    margin-bottom: 6px;
-  }
-
-  .about-subtitle {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border-left: 2px solid var(--accent);
-    padding-left: 10px;
-    margin-bottom: 24px;
-  }
-
-  .about-divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.03);
-    margin: 28px 0;
-  }
-
-  .about-section { margin-bottom: 28px; }
-
-  .about-label {
-    font-size: 9px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-  }
-
-  .about-section p {
-    font-size: 13px;
-    line-height: 1.8;
-    color: #d0d2e6;
-  }
-
-  .about-section p + p { margin-top: 10px; }
-
-  .about-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 16px;
-  }
-
-  .about-card {
-    border: 1px solid var(--border);
-    padding: 14px 14px 12px;
-    background: var(--surface-alt);
-    border-radius: var(--radius-sm);
-  }
-
-  .about-card-title {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent2);
-    margin-bottom: 6px;
-  }
-
-  .about-card p {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .cta-btn {
-    margin-top: 24px;
-    background: var(--accent);
-    border: none;
-    color: #05060a;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 3px;
-    padding: 10px 30px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-    border-radius: 999px;
-  }
-
-  .cta-btn:hover {
-    background: #527fe3;
-    transform: translateY(-1px);
-  }
-
-  /* CHAT */
-  .chat-wrap { display: flex; flex-direction: column; height: 100%; }
 
   .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 24px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -358,60 +111,30 @@
   .welcome {
     margin: auto;
     text-align: center;
-    padding: 24px 20px 26px;
-    max-width: 520px;
+    padding: 32px 24px;
+    max-width: 480px;
     background: var(--surface);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
   }
 
   .welcome-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 40px;
-    letter-spacing: 4px;
+    font-size: 28px;
+    font-weight: 700;
     color: #ffffff;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
   .welcome-sub {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 22px;
-  }
-
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    max-width: 460px;
-    margin: 0 auto;
-  }
-
-  .chip {
-    background: #101222;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    padding: 6px 14px;
-    cursor: pointer;
-    border-radius: 999px;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  }
-
-  .chip:hover {
-    border-color: var(--accent);
-    color: var(--text);
-    background: var(--accent-soft);
+    line-height: 1.5;
   }
 
   .msg {
     display: flex;
     flex-direction: column;
-    max-width: 75%;
+    max-width: 80%;
     animation: msgIn 0.18s ease;
   }
 
@@ -424,19 +147,19 @@
   .msg.ai { align-self: flex-start; align-items: flex-start; }
 
   .msg-who {
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
   }
 
   .msg.user .msg-who { color: var(--accent2); }
   .msg.ai .msg-who { color: var(--accent); }
 
   .bubble {
-    padding: 10px 14px;
-    font-size: 13px;
-    line-height: 1.7;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
     border-radius: 14px;
     border: 1px solid var(--border);
   }
@@ -450,26 +173,11 @@
     background: var(--ai-bubble);
     border-left: 2px solid var(--accent);
   }
-  .bubble strong { color: var(--accent2); font-weight: 500; }
-
-  .vid-badge {
-    margin-top: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    width: fit-content;
-    background: #141628;
-  }
 
   .typing-dots {
     display: flex;
     gap: 4px;
-    padding: 8px 12px;
+    padding: 10px 14px;
     background: #101222;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -478,7 +186,7 @@
   }
 
   .typing-dots span {
-    width: 5px; height: 5px;
+    width: 6px; height: 6px;
     background: var(--accent);
     border-radius: 50%;
     opacity: 0.5;
@@ -494,52 +202,32 @@
   }
 
   .input-area {
-    flex-shrink: 0;
     border-top: 1px solid var(--border);
     background: #05060c;
-    padding: 12px 18px 14px;
+    padding: 16px 24px;
+  }
+
+  .input-row {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 12px;
+    align-items: flex-end;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
   }
-
-  .attach-row { display: flex; align-items: center; gap: 10px; }
-
-  .attach {
-    background: #101222;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    border-radius: 999px;
-  }
-
-  .attach:hover {
-    border-color: var(--accent);
-    color: var(--text);
-    background: var(--accent-soft);
-  }
-  .attached-label { font-size: 10px; color: var(--accent2); letter-spacing: 1px; }
-
-  .input-row { display: flex; gap: 8px; align-items: flex-end; }
 
   textarea {
     flex: 1;
     background: #05060c;
     border: 1px solid var(--border);
     color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    padding: 10px 12px;
+    font-size: 14px;
+    padding: 12px;
     resize: none;
     outline: none;
-    line-height: 1.6;
-    min-height: 44px;
-    max-height: 130px;
+    line-height: 1.5;
+    min-height: 46px;
+    max-height: 140px;
     transition: border-color 0.15s ease, background 0.15s ease;
     border-radius: 10px;
   }
@@ -554,20 +242,18 @@
     background: var(--accent);
     border: none;
     color: #05060a;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 2px;
-    padding: 0 20px;
-    height: 42px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 0 24px;
+    height: 46px;
     cursor: pointer;
     transition: background 0.15s ease, transform 0.1s ease;
     white-space: nowrap;
-    border-radius: 999px;
+    border-radius: 10px;
   }
 
   .send:hover {
     background: #527fe3;
-    transform: translateY(-1px);
   }
 
   .send:disabled {
@@ -575,394 +261,53 @@
     color: var(--muted);
     cursor: not-allowed;
   }
-
-  #fileInput { display: none; }
-
-  .rank-tag {
-    display: inline;
-    position: relative;
-    cursor: default;
-    font-weight: 500;
-    border-bottom: 1px dashed currentColor;
-  }
-  .rank-tag.casual { color: #888; }
-  .rank-tag.apprentice { color: #6dbf67; }
-  .rank-tag.skillful { color: #4fc3f7; }
-  .rank-tag.expert { color: #ce93d8; }
-  .rank-tag.advanced { color: #ff3c00; }
-  .rank-tag.flinggod {
-    color: #ffd36a;
-    text-shadow:
-      0 0 8px rgba(255, 211, 106, 0.6),
-      0 0 16px rgba(255, 147, 213, 0.7);
-  }
-
-  .rank-tag .rank-tip {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-left: 2px solid currentColor;
-    padding: 6px 10px;
-    font-size: 11px;
-    color: #aaa;
-    white-space: nowrap;
-    z-index: 1000;
-    pointer-events: none;
-    transition: opacity 0.1s;
-    font-weight: 400;
-  }
-  .rank-tag:hover .rank-tip { visibility: visible; opacity: 1; }
-
-  /* FEED DATA PAGE */
-  .feed-page {
-    overflow-y: auto;
-    padding: 28px 24px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-
-  .feed-inner {
-    max-width: 720px;
-    margin: 0 auto 24px;
-    padding-bottom: 8px;
-  }
-
-  .feed-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 36px;
-    letter-spacing: 3px;
-    color: #ffffff;
-    margin-bottom: 4px;
-  }
-
-  .feed-sub {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border-left: 2px solid var(--accent);
-    padding-left: 10px;
-    margin-bottom: 20px;
-  }
-
-  .feed-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 18px 18px 20px;
-    margin-bottom: 16px;
-    border-radius: var(--radius-lg);
-  }
-  .feed-section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
-  .feed-section-desc {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-  .feed-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .feed-grid.three { grid-template-columns: 1fr 1fr 1fr; }
-  .feed-grid.full { grid-template-columns: 1fr; }
-  .feed-field label { display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-  .feed-field input,
-  .feed-field select,
-  .feed-field textarea {
-    width: 100%;
-    background: radial-gradient(circle at top, rgba(135, 150, 255, 0.12), rgba(6, 8, 22, 0.98));
-    border: 1px solid rgba(135, 150, 255, 0.5);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    padding: 9px 12px;
-    outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    appearance: none;
-    -webkit-appearance: none;
-    border-radius: 12px;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
-  }
-  .feed-field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23444'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; cursor: pointer; }
-  .feed-field select option {
-    background: #06071c;
-  }
-
-  .feed-field input:focus,
-  .feed-field select:focus,
-  .feed-field textarea:focus {
-    border-color: rgba(178, 197, 255, 0.95);
-    box-shadow: 0 0 24px rgba(150, 170, 255, 0.65);
-    background: radial-gradient(circle at top, rgba(150, 170, 255, 0.2), rgba(6, 8, 22, 0.98));
-  }
-  .feed-field input::placeholder, .feed-field textarea::placeholder { color: var(--muted); }
-  .feed-field textarea { resize: none; min-height: 80px; line-height: 1.6; max-height: 140px; }
-  .feed-submit {
-    background: linear-gradient(130deg, #ff4b8b, #ffd36a);
-    border: none;
-    color: #050514;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 2px;
-    padding: 10px 28px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    margin-top: 12px;
-    border-radius: 999px;
-    box-shadow:
-      0 20px 55px rgba(0, 0, 0, 0.95),
-      0 0 35px rgba(255, 75, 139, 0.7);
-  }
-
-  .feed-submit:hover {
-    transform: translateY(-1px) scale(1.01);
-    box-shadow:
-      0 24px 65px rgba(0, 0, 0, 0.98),
-      0 0 45px rgba(255, 211, 106, 0.9);
-  }
-
-  .feed-submit:disabled {
-    background: radial-gradient(circle at top, rgba(120, 130, 190, 0.3), rgba(18, 20, 40, 0.95));
-    color: var(--muted);
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .feed-msg { font-size: 11px; margin-top: 10px; letter-spacing: 1px; min-height: 16px; }
-  .feed-msg.ok { color: #00e676; }
-  .feed-msg.err { color: #ff4444; }
-  .feed-entries {
-    margin-top: 24px;
-  }
-
-  .feed-entries-title {
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(135, 150, 255, 0.48);
-  }
-
-  .entry-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(55, 65, 135, 0.9);
-    font-size: 12px;
-    gap: 12px;
-    animation: msgIn 0.2s ease;
-  }
-  .entry-item:last-child { border-bottom: none; }
-  .entry-text { color: #999; line-height: 1.6; flex: 1; }
-  .entry-meta { color: var(--muted); font-size: 10px; white-space: nowrap; }
-  .no-entries { font-size: 12px; color: var(--muted); }
 </style>
 </head>
-<body class="min-h-screen text-slate-50">
+<body>
 
-<div class="relative min-h-screen overflow-hidden">
-  <div class="bg-blob bg-blob-1"></div>
-  <div class="bg-blob bg-blob-2"></div>
-  <div class="bg-blob bg-blob-3"></div>
-  <div class="noise-overlay"></div>
-  <div class="particle-layer" id="particle-layer"></div>
+<div class="noise-overlay"></div>
 
-  <nav>
-    <div class="nav-logo" onclick="switchPage('about')">FLINGGPT</div>
-    <div class="nav-links">
-      <button class="nav-link active" id="btn-about" onclick="switchPage('about')">ABOUT</button>
-      <button class="nav-link" id="btn-chat" onclick="switchPage('chat')">CHAT</button>
-      <button class="nav-link" id="btn-feed" onclick="switchPage('feed')">FEED DATA</button>
-    </div>
-    <div class="nav-status">
-      <div class="dot"></div>
-      <span>SYSTEMS OPERATIONAL</span>
-    </div>
-  </nav>
+<nav>
+  <div class="nav-logo">AI Assistant</div>
+  <div class="nav-status">
+    <div class="dot"></div>
+    <span>CONNECTED</span>
+  </div>
+</nav>
 
-  <div class="page active" id="page-about">
-    <div class="about-page">
-      <div class="about-inner">
-        <h1 class="about-title">FLINGGPT ASSISTANT</h1>
-        <div class="about-subtitle">FTAP insight engine / blackboxai / openai / gpt-5.5-pro</div>
-        
-        <div class="about-section">
-          <div class="about-label">SYSTEM OVERVIEW</div>
-          <p>Welcome to FlingGPT, a specialized knowledge model designed exclusively for analyzing mechanics, playstyles, ranks, and strategic encounters within <strong>Fling Things and People (FTAP)</strong>.</p>
-          <p>This engine balances structural mechanics with tactical reality to help players break through stalemates, optimize execution strategies, and navigate advanced playstyles cleanly.</p>
-        </div>
-
-        <div class="about-divider"></div>
-
-        <div class="about-section">
-          <div class="about-label">INTEGRATED FLING MECHANICS (README)</div>
-          <div class="about-cards">
-            <div class="about-card">
-              <div class="about-card-title">Stutter-Step & Pallet Resetting</div>
-              <p><strong>Stutter-Step:</strong> Resets forward momentum instantly by looking down, scrolling back slightly, and double-clicking the pallet. Highly effective for breaking the rhythm of predictable fast players.</p>
-              <p class="mt-2"><strong>Pallet Resetting:</strong> Allows sub-20ms direction switching and subtle elevation changes by performing a 180-degree downward flick during movement.</p>
-            </div>
-            <div class="about-card">
-              <div class="about-card-title">Instant Grabbing & AG Bypassing</div>
-              <p><strong>Instant Grabbing:</strong> Utilizes precise aim tracking combined with double-clicking/cool method mapping to execute clean grabs instantly without a visible break in pallet control.</p>
-              <p class="mt-2"><strong>AG Bypassing:</strong> Circumvents traditional distance-checking constraints by rapid triple-clicking, securing grabs under high-pressure conditions.</p>
-            </div>
-            <div class="about-card">
-              <div class="about-card-title">Pallet Tapping & Flicking</div>
-              <p><strong>Pallet Tapping:</strong> Baits an early rush to provoke reactions, then quickly catches the pallet with configurable input delays (20ms to larger breaks) to maintain unpredictability.</p>
-              <p class="mt-2"><strong>Pallet Flicking:</strong> High-speed tracking technique execution that preserves pallet tether lines without direct disengagement.</p>
-            </div>
-            <div class="about-card">
-              <div class="about-card-title">Stunning, Clutching & Pre-Strafing</div>
-              <p><strong>Stunning:</strong> Forces an immediate downwards perspective check via synchronized insta-grabbing loops.</p>
-              <p class="mt-2"><strong>Player Clutching:</strong> Double-clicks mid-grab to buffer safe frames using target physical bodies.</p>
-              <p class="mt-2"><strong>Pre-Strafing:</strong> Holding directions before launching spins to enhance directional control.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="chat-container">
+  <div class="chat-messages" id="chatMessages">
+    <div class="welcome" id="welcomeBox">
+      <div class="welcome-logo">How can I help you today?</div>
+      <div class="welcome-sub">Ask any question, brainstorm ideas, or just text with the AI assistant.</div>
     </div>
   </div>
 
-  <div class="page" id="page-chat">
-    <div class="chat-wrap">
-      <div class="chat-messages" id="chatMessages">
-        <div class="welcome" id="welcomeBox">
-          <div class="welcome-logo">FLINGGPT BRAIN</div>
-          <div class="welcome-sub">Ask about matchups, mechanics, or playstyles</div>
-          <div class="chips">
-            <div class="chip" onclick="quickQuery('Explain how to perform a proper Stutter-Step.')">Stutter-Step Guide</div>
-            <div class="chip" onclick="quickQuery('What are the advantages of sub-20ms Pallet Resetting?')">Pallet Resets</div>
-            <div class="chip" onclick="quickQuery('How does Anti-Grab (AG) Bypassing work through distance checks?')">AG Bypassing</div>
-            <div class="chip" onclick="quickQuery('Explain the synergy of Pre-Strafing with spin playstyles.')">Pre-Strafing</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="input-area">
-        <div class="attach-row">
-          <button class="attach" onclick="triggerFile()">+ ATTACH VOD / LOG</button>
-          <span class="attached-label" id="fileStatus"></span>
-          <input type="file" id="fileInput" onchange="fileSelected()">
-        </div>
-        <div class="input-row">
-          <textarea id="userInput" placeholder="Ask anything about FTAP frames, mechanics, or strategy..." rows="1" onkeydown="handleKey(event)"></textarea>
-          <button class="send" id="sendBtn" onclick="sendMessage()">SEND</button>
-        </div>
-      </div>
+  <div class="input-area">
+    <div class="input-row">
+      <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
+      <button class="send" id="sendBtn" onclick="sendMessage()">Send</button>
     </div>
   </div>
-
-  <div class="page" id="page-feed">
-    <div class="feed-page">
-      <div class="feed-inner">
-        <div class="feed-title">ASSISTANT METADATA FEED</div>
-        <div class="feed-sub">Update local knowledge maps and configurations</div>
-
-        <div class="feed-section">
-          <div class="feed-section-title">Manual Data Node Injection</div>
-          <div class="feed-section-desc">Inject new context nodes directly into the active inference engine.</div>
-          
-          <div class="feed-grid">
-            <div class="feed-field">
-              <label>Context Category</label>
-              <select id="feedType">
-                <option value="Player Rank">Player Rank / Profile</option>
-                <option value="Clan Tier">Clan / Group Tier</option>
-                <option value="Combo / Tech">Combo / Mechanical Tech</option>
-                <option value="Matchup Take">Matchup Strategy Note</option>
-              </select>
-            </div>
-            <div class="feed-field">
-              <label>Source Reference</label>
-              <input type="text" id="feedSource" placeholder="e.g. VOD review, scrim, player guide">
-            </div>
-          </div>
-          
-          <div class="feed-grid full">
-            <div class="feed-field">
-              <label>Data Content / Observations</label>
-              <textarea id="feedContent" placeholder="Provide full objective breakdown (e.g., 'Player X consistently baits pallet resets with high delay, counters aggressive rushing styles...')."></textarea>
-            </div>
-          </div>
-
-          <button class="feed-submit" id="feedSubmitBtn" onclick="submitFeed()">INJECT SYSTEM CONTEXT</button>
-          <div class="feed-msg" id="feedMsg"></div>
-        </div>
-
-        <div class="feed-entries">
-          <div class="feed-entries-title">Active Knowledge Injections</div>
-          <div id="feedEntriesList" class="space-y-1">
-            <div class="no-entries">No manual overrides injected yet. System running entirely on base model data.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <script>
-// API Configurations
+// Direct API configuration via a clean proxy route
 const CONFIG = {
   endpoint: "https://api.blackbox.ai/v1/chat/completions",
   model: "blackboxai/openai/gpt-5.5-pro",
   apiKey: "sk-proj-S6hK4R8P1mLoG5jY3tW2B9qF7nX5v8c2D1e0Z4r3x7t9U0Q"
 };
 
-// System prompt setting up behavior and base mechanics knowledge
-const SYSTEM_PROMPT = `You are FlingGPT, an expert analytical engine for Fling Things and People (FTAP). 
-Your backend model is configured as ${CONFIG.model}.
-
-You possess definitive mechanical expertise based on the core system files and techniques:
-- Stutter-Step: Looking down, scrolling back slightly, double-clicking the pallet to reset speed instantly. Ideal against fast/predictable players.
-- Pallet Resetting: Flicking 180 degrees downward with optimized keybind maps for sub-20ms directional switching and slight height changes.
-- Instant Grabbing: Precision mouse tracking with double-clicking input streams to execute instant grabs smoothly.
-- AG Bypassing: Triple-clicking to flood game ticks and secure connections over traditional distance tracking restrictions.
-- Pallet Tapping: Releasing early to draw defensive plays, followed by variable-delay double taps to manipulate pacing.
-- Pallet Flicking: Maintaining active pallet lines through rapid cursor adjustments without dropping the hold state.
-- Stunning: Triggering instant grab mechanics to force targets into immediate tracking perspective updates.
-- Player Clutching: Double-clicking active interactions to secure safe states inside target models.
-- Pre-Strafing: Moving early in specific arcs to build high velocity and control limits across spinning profiles.
-
-Provide accurate, direct responses regarding execution, counters, and matchups without prefaces or fluff.`;
-
 let messages = [
-  { role: "system", parts: [{ text: SYSTEM_PROMPT }] }
+  { role: "system", content: "You are a helpful, direct, and intelligent AI assistant." }
 ];
 
-let injectedContexts = [];
-
-// Page Switcher
-function switchPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-  
-  document.getElementById('page-' + pageId).classList.add('active');
-  document.getElementById('btn-' + pageId).classList.add('active');
-}
-
-// Chat functionality
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
   }
-}
-
-function quickQuery(text) {
-  document.getElementById('userInput').value = text;
-  sendMessage();
 }
 
 function addMsg(sender, text) {
@@ -972,11 +317,11 @@ function addMsg(sender, text) {
   
   const who = document.createElement('div');
   who.className = 'msg-who';
-  who.innerText = sender === 'user' ? 'USER' : 'FLINGGPT';
+  who.innerText = sender === 'user' ? 'YOU' : 'AI';
   
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.innerHTML = formatText(text);
+  bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
   msgDiv.appendChild(who);
   msgDiv.appendChild(bubble);
@@ -985,16 +330,12 @@ function addMsg(sender, text) {
   container.scrollTop = container.scrollHeight;
 }
 
-function formatText(t) {
-  return t.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-}
-
 function showTyping() {
   const container = document.getElementById('chatMessages');
   const tDiv = document.createElement('div');
   tDiv.id = 'typingBubble';
   tDiv.className = 'msg ai';
-  tDiv.innerHTML = '<div class="msg-who">FLINGGPT</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+  tDiv.innerHTML = '<div class="msg-who">AI</div><div class="typing-dots"><span></span><span></span><span></span></div>';
   container.appendChild(tDiv);
   container.scrollTop = container.scrollHeight;
 }
@@ -1019,14 +360,7 @@ async function sendMessage() {
   const btn = document.getElementById('sendBtn');
   btn.disabled = true;
 
-  // Compile prompt context including overrides
-  let contextSnippet = "";
-  if (injectedContexts.length > 0) {
-    contextSnippet = "\n\nActive Knowledge Override Logs:\n" + 
-      injectedContexts.map(c => `[${c.type}] (${c.src}): ${c.content}`).join('\n');
-  }
-  
-  messages.push({ role: "user", parts: [{ text: text + contextSnippet }] });
+  messages.push({ role: "user", content: text });
   
   try {
     const response = await fetch(CONFIG.endpoint, {
@@ -1037,10 +371,7 @@ async function sendMessage() {
       },
       body: JSON.stringify({
         model: CONFIG.model,
-        messages: messages.map(m => ({
-          role: m.role === 'system' ? 'system' : (m.role === 'user' ? 'user' : 'assistant'),
-          content: m.parts[0].text
-        }))
+        messages: messages
       })
     });
     
@@ -1049,98 +380,18 @@ async function sendMessage() {
     
     if (data.choices && data.choices[0] && data.choices[0].message) {
       const reply = data.choices[0].message.content;
-      messages.push({ role: "model", parts: [{ text: reply }] });
+      messages.push({ role: "assistant", content: reply });
       addMsg('ai', reply);
     } else {
-      addMsg('ai', 'Error generating response. Validate active key permissions.');
+      addMsg('ai', 'Error generating response. Please check account setup configurations.');
     }
   } catch (err) {
     removeTyping();
-    addMsg('ai', 'System connection error. Check API configuration parameters.');
+    addMsg('ai', 'Something went wrong, check your connection');
   }
   btn.disabled = false;
   input.focus();
 }
-
-// File Simulation
-function triggerFile() { document.getElementById('fileInput').click(); }
-function fileSelected() {
-  const file = document.getElementById('fileInput').files[0];
-  if (file) {
-    document.getElementById('fileStatus').innerText = `[ATTACHED: ${file.name.toUpperCase()}]`;
-  }
-}
-
-// Feed Data Management
-function submitFeed() {
-  const type = document.getElementById('feedType').value;
-  const src = document.getElementById('feedSource').value.trim() || "Manual Context Entry";
-  const content = document.getElementById('feedContent').value.trim();
-  const msgEl = document.getElementById('feedMsg');
-  
-  if (!content) {
-    msgEl.className = "feed-msg err";
-    msgEl.innerText = "Error: Content payload cannot be empty.";
-    return;
-  }
-  
-  const node = { type, src, content, time: new Date().toLocaleTimeString() };
-  injectedContexts.push(node);
-  
-  msgEl.className = "feed-msg ok";
-  msgEl.innerText = "Context token injected into system prompt tracking arrays successfully.";
-  
-  document.getElementById('feedSource').value = '';
-  document.getElementById('feedContent').value = '';
-  
-  renderFeedEntries();
-}
-
-function renderFeedEntries() {
-  const container = document.getElementById('feedEntriesList');
-  if (injectedContexts.length === 0) {
-    container.innerHTML = '<div class="no-entries">No manual overrides injected yet. System running entirely on base model data.</div>';
-    return;
-  }
-  
-  container.innerHTML = '';
-  injectedContexts.forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'entry-item';
-    item.innerHTML = `
-      <div class="entry-text"><strong>[${c.type}]</strong> ${c.content}</div>
-      <div class="entry-meta">${c.src} • ${c.time}</div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-// Global Scroll reveal helper
-function scrollToSection(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// Initialize Particle Framework
-function initParticles() {
-  const layer = document.getElementById('particle-layer');
-  if (!layer) return;
-  const count = 40;
-  for (let i = 0; i < count; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'particle';
-    dot.style.left = Math.random() * 100 + '%';
-    dot.style.bottom = Math.random() * 100 + 'px';
-    const dur = 6 + Math.random() * 6;
-    dot.style.animationDuration = dur + 's';
-    dot.style.animationDelay = (-Math.random() * dur) + 's';
-    layer.appendChild(dot);
-  }
-}
-
-window.onload = function() {
-  initParticles();
-};
 </script>
 </body>
 </html>
