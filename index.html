@@ -294,7 +294,7 @@
 <script>
 const CONFIG = {
   endpoint: "https://api.blackbox.ai/v1/chat/completions",
-  model: "blackboxai/openai/gpt-5.5-pro",
+  model: "blackboxai/anthropic/claude-fable-5",
   apiKey: "sk-proj-S6hK4R8P1mLoG5jY3tW2B9qF7nX5v8c2D1e0Z4r3x7t9U0Q"
 };
 
@@ -320,7 +320,7 @@ function addMsg(sender, text) {
   
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\"/g, '<strong>$1</strong>');
+  bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
   msgDiv.appendChild(who);
   msgDiv.appendChild(bubble);
