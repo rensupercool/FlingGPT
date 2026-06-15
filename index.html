@@ -1,298 +1,884 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chat Assistant</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FTAP Field Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
-  :root {
-    --bg: #05060a;
-    --surface: #0c0d18;
-    --border: #1b1d32;
-    --accent: #5b8cff;
-    --accent-soft: rgba(91, 140, 255, 0.14);
-    --accent2: #f5b567;
-    --text: #f5f5ff;
-    --muted: #7f8295;
-    --user-bubble: #131528;
-    --ai-bubble: #101222;
-    --radius-lg: 18px;
-  }
+    :root {
+      color-scheme: dark;
+      --bg: #050711;
+      --bg-soft: #0b1020;
+      --panel: rgba(13, 19, 38, 0.78);
+      --panel-strong: rgba(15, 23, 42, 0.92);
+      --line: rgba(148, 163, 184, 0.18);
+      --line-bright: rgba(125, 211, 252, 0.4);
+      --text: #edf4ff;
+      --muted: #9aa8bd;
+      --cyan: #67e8f9;
+      --blue: #60a5fa;
+      --violet: #a78bfa;
+      --pink: #f0abfc;
+      --amber: #fbbf24;
+      --green: #86efac;
+      --danger: #fb7185;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+      --radius: 28px;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+    * {
+      box-sizing: border-box;
+    }
 
-  body {
-    background: radial-gradient(circle at top, #111827 0, #020617 55%);
-    color: var(--text);
-    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  .noise-overlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.16;
-    mix-blend-mode: soft-light;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1600 900' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E");
-    z-index: 0;
-  }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(103, 232, 249, 0.22), transparent 28rem),
+        radial-gradient(circle at 88% 10%, rgba(167, 139, 250, 0.24), transparent 30rem),
+        radial-gradient(circle at 55% 58%, rgba(96, 165, 250, 0.12), transparent 34rem),
+        linear-gradient(135deg, #030712 0%, #07111f 48%, #0b1020 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
 
-  nav {
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    height: 60px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(5, 6, 14, 0.96);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    z-index: 10;
-  }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), transparent 84%);
+    }
 
-  .nav-logo {
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: #f5f5ff;
-  }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1600 900' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
 
-  .nav-status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
+    ::selection {
+      background: rgba(103, 232, 249, 0.25);
+      color: #ffffff;
+    }
 
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #2ecc71;
-    animation: blink 2s infinite;
-  }
+    .font-display {
+      font-family: "Space Grotesk", Inter, sans-serif;
+    }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
 
-  .chat-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    z-index: 10;
-  }
+    .glass {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(11, 16, 32, 0.64));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
 
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      border: 1px solid rgba(103, 232, 249, 0.24);
+      background: rgba(8, 47, 73, 0.26);
+      color: #cffafe;
+      border-radius: 999px;
+      padding: 0.48rem 0.82rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
 
-  .chat-messages::-webkit-scrollbar { width: 3px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); }
+    .chip::before {
+      content: "";
+      width: 0.42rem;
+      height: 0.42rem;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 20px var(--cyan);
+    }
 
-  .welcome {
-    margin: auto;
-    text-align: center;
-    padding: 32px 24px;
-    max-width: 480px;
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-  }
+    .section-eyebrow {
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
 
-  .welcome-logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 6px;
-  }
+    .section-title {
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: clamp(2rem, 5vw, 3.65rem);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+    }
 
-  .welcome-sub {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
+    .muted {
+      color: var(--muted);
+    }
 
-  .msg {
-    display: flex;
-    flex-direction: column;
-    max-width: 80%;
-    animation: msgIn 0.18s ease;
-  }
+    .nav-link {
+      color: #b7c4d8;
+      transition: color 160ms ease, background 160ms ease;
+    }
 
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    .nav-link:hover {
+      color: #ffffff;
+      background: rgba(148, 163, 184, 0.1);
+    }
 
-  .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.ai { align-self: flex-start; align-items: flex-start; }
+    .hero-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(10px);
+      opacity: 0.82;
+      animation: float 8s ease-in-out infinite;
+    }
 
-  .msg-who {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
+    .hero-orb.one {
+      width: 180px;
+      height: 180px;
+      right: 10%;
+      top: 18%;
+      background: radial-gradient(circle, rgba(103, 232, 249, 0.5), transparent 68%);
+    }
 
-  .msg.user .msg-who { color: var(--accent2); }
-  .msg.ai .msg-who { color: var(--accent); }
+    .hero-orb.two {
+      width: 250px;
+      height: 250px;
+      right: 23%;
+      bottom: 8%;
+      background: radial-gradient(circle, rgba(167, 139, 250, 0.42), transparent 70%);
+      animation-delay: -2.5s;
+    }
 
-  .bubble {
-    padding: 12px 16px;
-    font-size: 14px;
-    line-height: 1.6;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-  }
+    .hero-orb.three {
+      width: 140px;
+      height: 140px;
+      left: 4%;
+      bottom: 14%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.34), transparent 68%);
+      animation-delay: -4s;
+    }
 
-  .msg.user .bubble {
-    background: var(--user-bubble);
-    border-color: #22253a;
-  }
+    @keyframes float {
+      0%, 100% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(0, -18px, 0) scale(1.04);
+      }
+    }
 
-  .msg.ai .bubble {
-    background: var(--ai-bubble);
-    border-left: 2px solid var(--accent);
-  }
+    .hero-stage {
+      position: relative;
+      min-height: 430px;
+      overflow: hidden;
+    }
 
-  .typing-dots {
-    display: flex;
-    gap: 4px;
-    padding: 10px 14px;
-    background: #101222;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    border-left: 2px solid var(--accent);
-    width: fit-content;
-  }
+    .arena-ring {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: min(62vw, 620px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -42%) rotateX(62deg) rotateZ(-12deg);
+      border: 1px solid rgba(103, 232, 249, 0.34);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 22px rgba(103, 232, 249, 0.035),
+        0 0 0 52px rgba(167, 139, 250, 0.025),
+        inset 0 0 60px rgba(103, 232, 249, 0.1);
+    }
 
-  .typing-dots span {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    opacity: 0.5;
-    animation: tdot 1.2s infinite;
-  }
+    .pallet {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 270px;
+      height: 52px;
+      border-radius: 18px;
+      transform-origin: center;
+      background: linear-gradient(90deg, rgba(103, 232, 249, 0.94), rgba(96, 165, 250, 0.74), rgba(240, 171, 252, 0.82));
+      box-shadow: 0 16px 60px rgba(103, 232, 249, 0.22);
+    }
 
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    .pallet.a {
+      transform: translate(-50%, -50%) rotate(-28deg);
+    }
 
-  @keyframes tdot {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-    30% { transform: translateY(-5px); opacity: 1; }
-  }
+    .pallet.b {
+      width: 210px;
+      opacity: 0.62;
+      transform: translate(-33%, 118%) rotate(20deg);
+    }
 
-  .input-area {
-    border-top: 1px solid var(--border);
-    background: #05060c;
-    padding: 16px 24px;
-  }
+    .pallet.c {
+      width: 170px;
+      height: 38px;
+      opacity: 0.5;
+      transform: translate(-125%, -190%) rotate(43deg);
+    }
 
-  .input-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
-  }
+    .stat-card,
+    .info-card,
+    .tech-card,
+    .player-card,
+    .clan-card {
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.62);
+      border-radius: 24px;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
 
-  textarea {
-    flex: 1;
-    background: #05060c;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 14px;
-    padding: 12px;
-    resize: none;
-    outline: none;
-    line-height: 1.5;
-    min-height: 46px;
-    max-height: 140px;
-    transition: border-color 0.15s ease, background 0.15s ease;
-    border-radius: 10px;
-  }
+    .stat-card:hover,
+    .info-card:hover,
+    .tech-card:hover,
+    .player-card:hover,
+    .clan-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(103, 232, 249, 0.38);
+      background: rgba(15, 23, 42, 0.82);
+    }
 
-  textarea:focus {
-    border-color: var(--accent);
-    background: #080a14;
-  }
-  textarea::placeholder { color: var(--muted); }
+    .metric {
+      height: 0.55rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+    }
 
-  .send {
-    background: var(--accent);
-    border: none;
-    color: #05060a;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 0 24px;
-    height: 46px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-    white-space: nowrap;
-    border-radius: 10px;
-  }
+    .metric span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+    }
 
-  .send:hover {
-    background: #527fe3;
-  }
+    .timeline {
+      position: relative;
+    }
 
-  .send:disabled {
-    background: #1a1c2a;
-    color: var(--muted);
-    cursor: not-allowed;
-  }
-</style>
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 1rem;
+      top: 0.7rem;
+      bottom: 0.7rem;
+      width: 1px;
+      background: linear-gradient(to bottom, rgba(103, 232, 249, 0), rgba(103, 232, 249, 0.5), rgba(103, 232, 249, 0));
+    }
+
+    .rank-dot {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      flex: none;
+      border-radius: 999px;
+      background: rgba(103, 232, 249, 0.12);
+      border: 1px solid rgba(103, 232, 249, 0.36);
+      color: #cffafe;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .tab-button {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: #bfd0e4;
+      background: rgba(15, 23, 42, 0.58);
+      transition: all 160ms ease;
+    }
+
+    .tab-button.active,
+    .tab-button:hover {
+      color: #ffffff;
+      border-color: rgba(103, 232, 249, 0.42);
+      background: rgba(8, 47, 73, 0.4);
+    }
+
+    .tech-card[data-hidden="true"] {
+      display: none;
+    }
+
+    .tag {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(148, 163, 184, 0.08);
+      color: #cbd5e1;
+      border-radius: 999px;
+      padding: 0.25rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .shine {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shine::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.09), transparent 42%);
+      transform: translateX(-120%);
+      animation: shine 7s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0%, 55% {
+        transform: translateX(-120%);
+      }
+      78%, 100% {
+        transform: translateX(120%);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .hero-stage {
+        min-height: 320px;
+      }
+
+      .pallet.a {
+        width: 210px;
+      }
+
+      .pallet.b,
+      .pallet.c {
+        display: none;
+      }
+
+      .arena-ring {
+        width: 96vw;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header class="sticky top-0 z-50 border-b border-slate-200/10 bg-slate-950/70 backdrop-blur-2xl">
+    <nav class="shell flex items-center justify-between gap-4 py-4">
+      <a href="#top" class="font-display text-xl font-bold tracking-tight text-white">FTAP Field Guide</a>
+      <div class="hidden items-center gap-1 rounded-full border border-slate-200/10 bg-slate-900/60 p-1 text-sm font-semibold md:flex">
+        <a class="nav-link rounded-full px-4 py-2" href="#mechanics">Mechanics</a>
+        <a class="nav-link rounded-full px-4 py-2" href="#ranks">Ranks</a>
+        <a class="nav-link rounded-full px-4 py-2" href="#playstyles">Playstyles</a>
+        <a class="nav-link rounded-full px-4 py-2" href="#tech">Tech</a>
+        <a class="nav-link rounded-full px-4 py-2" href="#players">Players</a>
+      </div>
+      <a href="#tech" class="rounded-full bg-cyan-300 px-4 py-2 text-sm font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-white">Open guide</a>
+    </nav>
+  </header>
 
-<div class="noise-overlay"></div>
+  <main id="top">
+    <section class="shell grid gap-8 pb-16 pt-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:pb-24 lg:pt-16">
+      <div class="relative z-10">
+        <div class="chip mb-6">Roblox PvP Knowledge Base</div>
+        <h1 class="font-display text-[clamp(3.3rem,10vw,7.8rem)] font-bold leading-[0.84] tracking-[-0.085em]">
+          FTAP<br>
+          <span class="bg-gradient-to-r from-cyan-200 via-blue-300 to-fuchsia-300 bg-clip-text text-transparent">without the noise.</span>
+        </h1>
+        <p class="mt-7 max-w-2xl text-lg leading-8 text-slate-300">
+          A clean guide to Fling Things and People PvP: movement, anti-grab, clutching, ranks, playstyles, notable players, clans, and the advanced pallet tech from the supplied notes.
+        </p>
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a href="#mechanics" class="rounded-full border border-cyan-200/40 bg-cyan-200/10 px-6 py-3 text-sm font-extrabold text-cyan-100 transition hover:bg-cyan-200 hover:text-slate-950">Start with mechanics</a>
+          <a href="#playstyles" class="rounded-full border border-slate-200/15 bg-slate-900/60 px-6 py-3 text-sm font-extrabold text-white transition hover:border-white/30 hover:bg-white/10">Compare styles</a>
+        </div>
+      </div>
 
-<nav>
-  <div class="nav-logo">AI Assistant</div>
-  <div class="nav-status">
-    <div class="dot"></div>
-    <span>CONNECTED</span>
-  </div>
-</nav>
+      <div class="glass hero-stage shine">
+        <div class="hero-orb one"></div>
+        <div class="hero-orb two"></div>
+        <div class="hero-orb three"></div>
+        <div class="arena-ring"></div>
+        <div class="pallet a"></div>
+        <div class="pallet b"></div>
+        <div class="pallet c"></div>
+        <div class="absolute inset-x-6 bottom-6 rounded-3xl border border-slate-200/10 bg-slate-950/55 p-5 backdrop-blur-xl">
+          <p class="section-eyebrow">Core loop</p>
+          <p class="mt-2 text-2xl font-bold tracking-tight text-white">Grab, control, break rhythm, finish low.</p>
+          <p class="mt-2 text-sm leading-6 text-slate-300">
+            FTAP PvP is built by players around pallet control, timing, aim, and momentum. There are no built-in dash or bunny-hop systems for combat movement.
+          </p>
+        </div>
+      </div>
+    </section>
 
-<div class="chat-container">
-  <div class="chat-messages" id="chatMessages">
-    <div class="welcome" id="welcomeBox">
-      <div class="welcome-logo">How can I help you today?</div>
-      <div class="welcome-sub">Ask any question, brainstorm ideas, or just chat with the AI assistant.</div>
+    <section class="shell grid gap-4 pb-20 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="stat-card p-5">
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-cyan-200">Grab reach</p>
+        <p class="mt-3 font-display text-4xl font-bold">30 studs</p>
+        <p class="mt-2 text-sm leading-6 text-slate-400">Aiming is proximity based, so timing and distance matter as much as crosshair placement.</p>
+      </article>
+      <article class="stat-card p-5">
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-violet-200">PvP format</p>
+        <p class="mt-3 font-display text-4xl font-bold">Open</p>
+        <p class="mt-2 text-sm leading-6 text-slate-400">No official PvP modes; fights happen through publics, private 1v1s, 2v2s, 3v3s, and FFAs.</p>
+      </article>
+      <article class="stat-card p-5">
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-amber-200">Rank tiers</p>
+        <p class="mt-3 font-display text-4xl font-bold">Low-mid-high</p>
+        <p class="mt-2 text-sm leading-6 text-slate-400">Most ranked labels use tiers I-III plus low, mid, and high modifiers.</p>
+      </article>
+      <article class="stat-card p-5">
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-emerald-200">Main styles</p>
+        <p class="mt-3 font-display text-4xl font-bold">Fast / slow</p>
+        <p class="mt-2 text-sm leading-6 text-slate-400">Most playstyles branch from fast pressure or slow reaction-based control.</p>
+      </article>
+    </section>
+
+    <section id="mechanics" class="shell pb-24">
+      <div class="mb-10 max-w-3xl">
+        <p class="section-eyebrow">Foundation</p>
+        <h2 class="section-title mt-3">Core mechanics that decide fights.</h2>
+        <p class="mt-5 text-lg leading-8 text-slate-300">
+          FTAP combat is less about a formal moveset and more about how players use the pallet, reach limit, velocity, and timing windows.
+        </p>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <article class="info-card p-6">
+          <h3 class="font-display text-2xl font-bold">Flinging</h3>
+          <p class="mt-3 leading-7 text-slate-300">Grab the opponent, move them into the floor to trigger ragdoll more consistently, then release low enough that clutching becomes harder.</p>
+        </article>
+        <article class="info-card p-6">
+          <h3 class="font-display text-2xl font-bold">Ragdolling</h3>
+          <p class="mt-3 leading-7 text-slate-300">Usually happens when someone is grabbed at decent speed, especially in air-to-air fights. It limits recovery and makes flings more threatening.</p>
+        </article>
+        <article class="info-card p-6">
+          <h3 class="font-display text-2xl font-bold">Aiming</h3>
+          <p class="mt-3 leading-7 text-slate-300">It feels like FPS aim, but players move fast enough that prediction and timing become just as important as tracking.</p>
+        </article>
+        <article class="info-card p-6">
+          <h3 class="font-display text-2xl font-bold">Movement</h3>
+          <p class="mt-3 leading-7 text-slate-300">Movement comes from grabbing the pallet at different positions, scrolling for speed, diving by looking down, or dragging back and upward for control.</p>
+        </article>
+        <article class="info-card p-6">
+          <h3 class="font-display text-2xl font-bold">AG / anti-grab</h3>
+          <p class="mt-3 leading-7 text-slate-300">AG is a distance check that cancels grabs when speed, distance, or ping makes the grab fail validation. Good slow players can bait rushes into AG.</p>
+        </article>
+        <article class="info-card p-6">
+          <h3 class="font-display text-2xl font-bold">Clutching</h3>
+          <p class="mt-3 leading-7 text-slate-300">Recovery after being flung is heavily ping based. Low flings and dunking reduce clutch chances; tabbing is frowned upon as an exploit.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="ranks" class="shell pb-24">
+      <div class="glass grid gap-10 p-6 md:p-9 lg:grid-cols-[0.82fr_1.18fr]">
+        <div>
+          <p class="section-eyebrow">Rank ladder</p>
+          <h2 class="section-title mt-3">How FTAP skill is commonly labeled.</h2>
+          <p class="mt-5 leading-8 text-slate-300">
+            The supplied hierarchy runs from casual to fling god. Skillful and above commonly use I, II, and III tiers, plus low, mid, and high modifiers.
+          </p>
+        </div>
+
+        <div class="timeline space-y-5">
+          <div class="relative flex gap-4">
+            <div class="rank-dot">1</div>
+            <div>
+              <h3 class="text-xl font-bold">Casual</h3>
+              <p class="mt-1 text-sm leading-6 text-slate-400">Grounded most of the time, can fling, can barely fly, and usually struggles with aim.</p>
+            </div>
+          </div>
+          <div class="relative flex gap-4">
+            <div class="rank-dot">2</div>
+            <div>
+              <h3 class="text-xl font-bold">Apprentice / app</h3>
+              <p class="mt-1 text-sm leading-6 text-slate-400">Can fly and grab straightforward face-to-face opportunities. Uses low, mid, and high labels.</p>
+            </div>
+          </div>
+          <div class="relative flex gap-4">
+            <div class="rank-dot">3</div>
+            <div>
+              <h3 class="text-xl font-bold">Skillful / sk</h3>
+              <p class="mt-1 text-sm leading-6 text-slate-400">Where players start getting good. Skillful players can fly without falling, grab easy chances consistently, and juke with fast direction changes.</p>
+            </div>
+          </div>
+          <div class="relative flex gap-4">
+            <div class="rank-dot">4</div>
+            <div>
+              <h3 class="text-xl font-bold">Expert / exp</h3>
+              <p class="mt-1 text-sm leading-6 text-slate-400">Often the best in a server. Experts are usually very strong at movement, aiming, or both.</p>
+            </div>
+          </div>
+          <div class="relative flex gap-4">
+            <div class="rank-dot">5</div>
+            <div>
+              <h3 class="text-xl font-bold">Advanced / adv</h3>
+              <p class="mt-1 text-sm leading-6 text-slate-400">Very rare. Advanced players are usually known, exceptional, and strong in both movement and aim.</p>
+            </div>
+          </div>
+          <div class="relative flex gap-4">
+            <div class="rank-dot">6</div>
+            <div>
+              <h3 class="text-xl font-bold">Fling god / fg</h3>
+              <p class="mt-1 text-sm leading-6 text-slate-400">No tiers, only levels. Reserved for the most notable players at their peaks.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="playstyles" class="shell pb-24">
+      <div class="mb-10 max-w-3xl">
+        <p class="section-eyebrow">Playstyles</p>
+        <h2 class="section-title mt-3">Fast pressure or slow control.</h2>
+        <p class="mt-5 text-lg leading-8 text-slate-300">
+          Most players begin from basic center-mass pallet movement, then branch toward fast rushes, slow baiting, or a hybrid of both.
+        </p>
+      </div>
+
+      <div class="grid gap-5 lg:grid-cols-2">
+        <article class="glass p-6 md:p-8">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-3xl font-bold">Fast archetypes</h3>
+            <span class="tag">rhythm pressure</span>
+          </div>
+          <div class="mt-6 grid gap-4">
+            <div class="info-card p-5">
+              <h4 class="font-bold text-cyan-100">High FPS</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-400">Very high FPS increases speed and control, enabling frequent dives and rapid stops.</p>
+            </div>
+            <div class="info-card p-5">
+              <h4 class="font-bold text-cyan-100">Aggressive-fast</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-400">Rush-heavy players who rely on pressure, decent aim, and fewer fancy transitions.</p>
+            </div>
+            <div class="info-card p-5">
+              <h4 class="font-bold text-cyan-100">Controlled-fast</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-400">Fast movement that stays readable to the player using it, allowing tech to flow naturally.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="glass p-6 md:p-8">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-3xl font-bold">Slow archetypes</h3>
+            <span class="tag">reaction control</span>
+          </div>
+          <div class="mt-6 grid gap-4">
+            <div class="info-card p-5">
+              <h4 class="font-bold text-violet-100">Very slow-slow</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-400">Waits for rushes, then dashes back or dives to punish the approach.</p>
+            </div>
+            <div class="info-card p-5">
+              <h4 class="font-bold text-violet-100">Hybrid-slow</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-400">Usually not fully slow, but shifts slower when reacting to a bad rush or risky move.</p>
+            </div>
+            <div class="info-card p-5">
+              <h4 class="font-bold text-violet-100">Elite slow</h4>
+              <p class="mt-2 text-sm leading-6 text-slate-400">Baits AG, dives under approaches, and punishes timing. Beating it requires baiting the dive before committing.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="tech" class="shell pb-24">
+      <div class="mb-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+        <div class="max-w-3xl">
+          <p class="section-eyebrow">Advanced tech</p>
+          <h2 class="section-title mt-3">Pallet methods, grabs, resets, and rhythm breaks.</h2>
+          <p class="mt-5 text-lg leading-8 text-slate-300">
+            CM means cool method in the source notes. Percentages below come from those notes and describe the stated possibility, practicality, or chemistry.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2" aria-label="Filter advanced tech cards">
+          <button class="tab-button active rounded-full px-4 py-2 text-sm font-bold" data-filter="all">All</button>
+          <button class="tab-button rounded-full px-4 py-2 text-sm font-bold" data-filter="fast">Fast</button>
+          <button class="tab-button rounded-full px-4 py-2 text-sm font-bold" data-filter="slow">Slow</button>
+          <button class="tab-button rounded-full px-4 py-2 text-sm font-bold" data-filter="grab">Grab</button>
+          <button class="tab-button rounded-full px-4 py-2 text-sm font-bold" data-filter="reset">Reset</button>
+        </div>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <article class="tech-card p-6" data-tags="fast reset">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Stutter-step</h3>
+            <span class="tag">fast</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A rhythm break that stops most speed by looking down and resetting on the pallet. Best with fast playstyles because it interrupts predictable rush timing.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">CM possibility 90%, practicality 80%.</p>
+            <div class="metric"><span style="width: 80%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="fast reset">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Pallet resetting</h3>
+            <span class="tag">reset</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A fast direction-switching reset done around the pallet. It can slightly shift elevation and pairs well with instant diving and stutter-step chains.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">CM possibility 70%, practicality 80%.</p>
+            <div class="metric"><span style="width: 80%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="grab fast">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Instant grabbing</h3>
+            <span class="tag">grab</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A close timing grab that works best for spin-heavy and tracking-heavy styles. It is strongest when movement does the aiming and the input lands at the right tick.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">CM possibility 90%, practicality up to 100% on fitting styles.</p>
+            <div class="metric"><span style="width: 100%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="grab slow">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">AG bypassing</h3>
+            <span class="tag">experimental</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">An unexplored triple-grab concept meant to raise the chance of securing a grab through anti-grab checks. The notes describe it as heavily chance-based.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">CM possibility 20%, practicality 40%.</p>
+            <div class="metric"><span style="width: 40%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="fast grab">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Pallet tapping</h3>
+            <span class="tag">mindgame</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A fake early rush where the pallet is tapped mid-approach to pause for a variable moment. Useful because the delay can be short or long enough to break reads.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">CM possibility 80%, practicality 60%.</p>
+            <div class="metric"><span style="width: 60%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="grab slow">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Pallet flicking</h3>
+            <span class="tag">flick</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A grab attempt while still holding the pallet and flicking quickly. It favors slower speeds because misses are less punishing and small flicks are more consistent.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">Small-flick possibility 70%, CM practicality 60%.</p>
+            <div class="metric"><span style="width: 60%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="fast reset">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Insta diving</h3>
+            <span class="tag">dive</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A dive chained into a pallet reset so momentum is refreshed and the player can rush immediately after dropping elevation.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">CM possibility 100%, practicality 80%.</p>
+            <div class="metric"><span style="width: 80%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="fast">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Scroll faking</h3>
+            <span class="tag">unconfirmed</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">An unconfirmed visual desync where an opponent may see max scroll in one direction while the player is not actually moving that way.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">Possibility around 10%; practical only if consistent.</p>
+            <div class="metric"><span style="width: 10%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="reset">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Throw resetting</h3>
+            <span class="tag">fallback</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A weaker reset using the throw mechanic. It changes elevation slightly and works best with spin styles that keep the pallet visible.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">Possible 70%, practical 10%.</p>
+            <div class="metric"><span style="width: 10%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="fast grab">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Stunning</h3>
+            <span class="tag">pressure</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A disruption where the opponent's pallet is grabbed so they have to look down and recover, creating a free grab window.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">Possible 100%, practical around 70% with CM.</p>
+            <div class="metric"><span style="width: 70%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="grab slow">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Player clutching</h3>
+            <span class="tag">survival</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">A clutch that uses the opponent's body while both players are grabbing each other. It favors slower survival-heavy play because those players get grabbed more often.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">The notes describe mastered consistency as very high.</p>
+            <div class="metric"><span style="width: 92%"></span></div>
+          </div>
+        </article>
+
+        <article class="tech-card p-6" data-tags="fast">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-bold">Pre-strafing</h3>
+            <span class="tag">control</span>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-slate-300">Strafing before the turn or spin you want to do. Fast and spin playstyles use it to add control to actions that may otherwise fail.</p>
+          <div class="mt-5 space-y-3 text-sm">
+            <p class="muted">Best with fast and spin playstyles.</p>
+            <div class="metric"><span style="width: 86%"></span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="players" class="shell pb-24">
+      <div class="mb-10 max-w-3xl">
+        <p class="section-eyebrow">Community notes</p>
+        <h2 class="section-title mt-3">Fling gods, remarkable players, and clan history.</h2>
+        <p class="mt-5 text-lg leading-8 text-slate-300">
+          These summaries follow the supplied notes. Some ranks and histories are disputed or marked as limited in the source material.
+        </p>
+      </div>
+
+      <div class="grid gap-5 lg:grid-cols-5">
+        <article class="player-card p-5 lg:col-span-1">
+          <p class="tag w-fit">fling god</p>
+          <h3 class="mt-4 text-xl font-bold">futurekiddo</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Known for unmatched movement, juking, and adapting style depending on the opponent.</p>
+        </article>
+        <article class="player-card p-5 lg:col-span-1">
+          <p class="tag w-fit">fling god</p>
+          <h3 class="mt-4 text-xl font-bold">spence</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Known as a top player who moved from fast dive-heavy play into slow aim-heavy control.</p>
+        </article>
+        <article class="player-card p-5 lg:col-span-1">
+          <p class="tag w-fit">fling god</p>
+          <h3 class="mt-4 text-xl font-bold">LostNPC</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Controlled-fast, consistent, strong aim, and rarely below expert 2 level when active.</p>
+        </article>
+        <article class="player-card p-5 lg:col-span-1">
+          <p class="tag w-fit">fling god</p>
+          <h3 class="mt-4 text-xl font-bold">zerogath</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Experienced ranker, early fling god, and creator of a refined left-right movement foundation.</p>
+        </article>
+        <article class="player-card p-5 lg:col-span-1">
+          <p class="tag w-fit">fling god</p>
+          <h3 class="mt-4 text-xl font-bold">rainz</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Noted for throwing the pallet repeatedly to reposition behind opponents.</p>
+        </article>
+      </div>
+
+      <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <article class="player-card p-5">
+          <h3 class="text-xl font-bold">rupasu</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Elite slow style, AG baiting, diving under approaches, and high-level aim.</p>
+        </article>
+        <article class="player-card p-5">
+          <h3 class="text-xl font-bold">chamo</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Helped popularize a slow player shift after taking inspiration from spence.</p>
+        </article>
+        <article class="player-card p-5">
+          <h3 class="text-xl font-bold">drey_man</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Known for strong aim and dive-heavy movement used to dodge and grab.</p>
+        </article>
+        <article class="player-card p-5">
+          <h3 class="text-xl font-bold">Surf</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Unique spin-focused style that works around opponents and grabs from behind.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="clans" class="shell pb-24">
+      <div class="glass p-6 md:p-9">
+        <div class="mb-8 max-w-3xl">
+          <p class="section-eyebrow">Clans</p>
+          <h2 class="section-title mt-3">Groups, standards, and reputations.</h2>
+          <p class="mt-5 text-lg leading-8 text-slate-300">
+            Clans are not official parts of FTAP. They are player groups that organize fights, alliances, wars, rankings, or standards.
+          </p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <article class="clan-card p-5">
+            <h3 class="font-display text-2xl font-bold">GEM</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-400">Elite adv+ group connected to zerogath and future, with many major names listed in the notes.</p>
+          </article>
+          <article class="clan-card p-5">
+            <h3 class="font-display text-2xl font-bold">IVC</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-400">High-standard clan associated with expert 3+ expectations and players like chamo and minzo.</p>
+          </article>
+          <article class="clan-card p-5">
+            <h3 class="font-display text-2xl font-bold">KL</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-400">A major FF:UT clan with influence and several high-profile names, currently inactive but alive.</p>
+          </article>
+          <article class="clan-card p-5">
+            <h3 class="font-display text-2xl font-bold">JBL / UE / AS</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-400">Long-running or smaller groups with different standards, regions, and activity levels.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200/10 py-8">
+    <div class="shell flex flex-col justify-between gap-3 text-sm text-slate-500 md:flex-row">
+      <p>FTAP Field Guide built from the provided notes.</p>
+      <p>No external API calls. Static page only.</p>
     </div>
-  </div>
+  </footer>
 
-  <div class="input-area">
-    <div class="input-row">
-      <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
-      <button class="send" id="sendBtn" onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-</div>
+  <script>
+    const filterButtons = document.querySelectorAll("[data-filter]");
+    const techCards = document.querySelectorAll(".tech-card");
 
-<script>
-const CONFIG = {
-  endpoint: "https://api.blackbox.ai/v1/chat/completions",
-  model: "blackboxai",
-  apiKey: "sk-proj-S6hK4R8P1mLoG5jY3tW2B9qF7nX5v8c2D1e0Z4r3x7
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const filter = button.dataset.filter;
+
+        filterButtons.forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+
+        techCards.forEach((card) => {
+          const tags = card.dataset.tags.split(" ");
+          card.dataset.hidden = filter !== "all" && !tags.includes(filter);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
