@@ -279,7 +279,7 @@
   <div class="chat-messages" id="chatMessages">
     <div class="welcome" id="welcomeBox">
       <div class="welcome-logo">How can I help you today?</div>
-      <div class="welcome-sub">Ask any question, brainstorm ideas, or just text with the AI assistant.</div>
+      <div class="welcome-sub">Ask any question, brainstorm ideas, or just chat with the AI assistant.</div>
     </div>
   </div>
 
@@ -292,7 +292,6 @@
 </div>
 
 <script>
-// Direct API configuration via a clean proxy route
 const CONFIG = {
   endpoint: "https://api.blackbox.ai/v1/chat/completions",
   model: "blackboxai/openai/gpt-5.5-pro",
@@ -321,7 +320,7 @@ function addMsg(sender, text) {
   
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\"/g, '<strong>$1</strong>');
   
   msgDiv.appendChild(who);
   msgDiv.appendChild(bubble);
