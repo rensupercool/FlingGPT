@@ -1,298 +1,1217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chat Assistant</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FTAP Field Guide</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
-  :root {
-    --bg: #05060a;
-    --surface: #0c0d18;
-    --border: #1b1d32;
-    --accent: #5b8cff;
-    --accent-soft: rgba(91, 140, 255, 0.14);
-    --accent2: #f5b567;
-    --text: #f5f5ff;
-    --muted: #7f8295;
-    --user-bubble: #131528;
-    --ai-bubble: #101222;
-    --radius-lg: 18px;
-  }
+    :root {
+      --bg: #06111a;
+      --bg-soft: #0b1b28;
+      --panel: rgba(10, 23, 34, 0.8);
+      --panel-strong: rgba(12, 28, 42, 0.96);
+      --border: rgba(133, 180, 212, 0.15);
+      --text: #edf6fb;
+      --muted: #9db0bf;
+      --accent: #66e1ff;
+      --accent-strong: #41c2ff;
+      --accent-soft: rgba(102, 225, 255, 0.14);
+      --warm: #ffbf75;
+      --danger: #ff7d8f;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max: 1200px;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  body {
-    background: radial-gradient(circle at top, #111827 0, #020617 55%);
-    color: var(--text);
-    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  .noise-overlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.16;
-    mix-blend-mode: soft-light;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1600 900' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E");
-    z-index: 0;
-  }
+    body {
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(66, 181, 255, 0.22), transparent 34%),
+        radial-gradient(circle at top right, rgba(255, 191, 117, 0.15), transparent 25%),
+        linear-gradient(180deg, #07121b 0%, #03080d 100%);
+      line-height: 1.6;
+    }
 
-  nav {
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    height: 60px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(5, 6, 14, 0.96);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    z-index: 10;
-  }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.06;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 92%);
+    }
 
-  .nav-logo {
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: #f5f5ff;
-  }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-  .nav-status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
+    .wrap {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
 
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #2ecc71;
-    animation: blink 2s infinite;
-  }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(20px);
+      background: rgba(4, 10, 17, 0.72);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
+    .topbar-inner {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
 
-  .chat-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    z-index: 10;
-  }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(135deg, rgba(102, 225, 255, 0.26), rgba(65, 194, 255, 0.08)),
+        rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(102, 225, 255, 0.24);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      font-weight: 800;
+      color: var(--accent);
+    }
 
-  .chat-messages::-webkit-scrollbar { width: 3px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); }
+    .brand-copy strong {
+      display: block;
+      font-size: 0.98rem;
+      letter-spacing: 0.04em;
+    }
 
-  .welcome {
-    margin: auto;
-    text-align: center;
-    padding: 32px 24px;
-    max-width: 480px;
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-  }
+    .brand-copy span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
 
-  .welcome-logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 6px;
-  }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
 
-  .welcome-sub {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
+    .nav-links a {
+      padding: 9px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      transition: 0.2s ease;
+    }
 
-  .msg {
-    display: flex;
-    flex-direction: column;
-    max-width: 80%;
-    animation: msgIn 0.18s ease;
-  }
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
 
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    .hero {
+      padding: 72px 0 42px;
+    }
 
-  .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.ai { align-self: flex-start; align-items: flex-start; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 24px;
+      align-items: stretch;
+    }
 
-  .msg-who {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
+    .hero-card,
+    .glass-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
 
-  .msg.user .msg-who { color: var(--accent2); }
-  .msg.ai .msg-who { color: var(--accent); }
+    .hero-card {
+      padding: 34px;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        radial-gradient(circle at top right, rgba(102, 225, 255, 0.18), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(255, 191, 117, 0.12), transparent 24%),
+        var(--panel-strong);
+    }
 
-  .bubble {
-    padding: 12px 16px;
-    font-size: 14px;
-    line-height: 1.6;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-  }
+    .hero-card::after,
+    .glass-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -45% auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(102, 225, 255, 0.18), transparent 65%);
+      pointer-events: none;
+    }
 
-  .msg.user .bubble {
-    background: var(--user-bubble);
-    border-color: #22253a;
-  }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      width: fit-content;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #cde6f2;
+      font-size: 0.84rem;
+      letter-spacing: 0.03em;
+    }
 
-  .msg.ai .bubble {
-    background: var(--ai-bubble);
-    border-left: 2px solid var(--accent);
-  }
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+      box-shadow: 0 0 20px rgba(102, 225, 255, 0.5);
+    }
 
-  .typing-dots {
-    display: flex;
-    gap: 4px;
-    padding: 10px 14px;
-    background: #101222;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    border-left: 2px solid var(--accent);
-    width: fit-content;
-  }
+    h1 {
+      margin-top: 24px;
+      max-width: 10ch;
+      font-size: clamp(2.7rem, 7vw, 5.3rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
 
-  .typing-dots span {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    opacity: 0.5;
-    animation: tdot 1.2s infinite;
-  }
+    .hero-copy {
+      margin-top: 18px;
+      max-width: 62ch;
+      color: #c7d8e2;
+      font-size: 1.02rem;
+    }
 
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    .hero-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-  @keyframes tdot {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-    30% { transform: translateY(-5px); opacity: 1; }
-  }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
 
-  .input-area {
-    border-top: 1px solid var(--border);
-    background: #05060c;
-    padding: 16px 24px;
-  }
+    .button.primary {
+      color: #031017;
+      background: linear-gradient(135deg, var(--accent), #8df2ff);
+      box-shadow: 0 18px 40px rgba(65, 194, 255, 0.25);
+    }
 
-  .input-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
-  }
+    .button.secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-  textarea {
-    flex: 1;
-    background: #05060c;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 14px;
-    padding: 12px;
-    resize: none;
-    outline: none;
-    line-height: 1.5;
-    min-height: 46px;
-    max-height: 140px;
-    transition: border-color 0.15s ease, background 0.15s ease;
-    border-radius: 10px;
-  }
+    .button:hover {
+      transform: translateY(-1px);
+    }
 
-  textarea:focus {
-    border-color: var(--accent);
-    background: #080a14;
-  }
-  textarea::placeholder { color: var(--muted); }
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 26px;
+    }
 
-  .send {
-    background: var(--accent);
-    border: none;
-    color: #05060a;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 0 24px;
-    height: 46px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-    white-space: nowrap;
-    border-radius: 10px;
-  }
+    .metric {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-  .send:hover {
-    background: #527fe3;
-  }
+    .metric strong {
+      display: block;
+      font-size: 1.3rem;
+      letter-spacing: -0.04em;
+    }
 
-  .send:disabled {
-    background: #1a1c2a;
-    color: var(--muted);
-    cursor: not-allowed;
-  }
-</style>
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 24px;
+    }
+
+    .glass-card {
+      padding: 24px;
+    }
+
+    .glass-card h2,
+    .section-head h2 {
+      font-size: 1.4rem;
+      letter-spacing: -0.03em;
+    }
+
+    .info-list {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .info-item {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .info-item strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .info-item p {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .section {
+      padding: 26px 0;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .section-head p {
+      max-width: 62ch;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background: rgba(11, 24, 35, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.25);
+    }
+
+    .card h3 {
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .card ul {
+      margin-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(102, 225, 255, 0.08);
+      border: 1px solid rgba(102, 225, 255, 0.15);
+      color: #d4f7ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .pill.warm {
+      background: rgba(255, 191, 117, 0.1);
+      border-color: rgba(255, 191, 117, 0.18);
+      color: #ffe7c2;
+    }
+
+    .pill.alert {
+      background: rgba(255, 125, 143, 0.11);
+      border-color: rgba(255, 125, 143, 0.18);
+      color: #ffd3da;
+    }
+
+    .rank-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .rank-item {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .rank-item strong {
+      font-size: 1rem;
+    }
+
+    .rank-item span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #d3e4ee;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .tech-card {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(15, 30, 44, 0.96), rgba(8, 18, 27, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tech-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(102, 225, 255, 0.7), transparent);
+    }
+
+    .tech-card h3 {
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+    }
+
+    .tech-card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .tech-metrics {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tech-metric {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tech-metric small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .tech-metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.95rem;
+    }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .player-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .player-card h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .player-meta {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: #c5d6e0;
+      font-size: 0.82rem;
+    }
+
+    .callout {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(135deg, rgba(255, 125, 143, 0.1), rgba(102, 225, 255, 0.08)),
+        rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .callout h3 {
+      margin-bottom: 8px;
+      font-size: 1.08rem;
+    }
+
+    .callout p {
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 36px 0 56px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid,
+      .grid.two,
+      .grid.three,
+      .players-grid,
+      .tech-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .players-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner,
+      .section-head,
+      .hero-actions,
+      .hero-metrics {
+        display: block;
+      }
+
+      .nav-links {
+        margin-top: 12px;
+        justify-content: flex-start;
+      }
+
+      .hero {
+        padding-top: 42px;
+      }
+
+      .hero-card,
+      .glass-card,
+      .card,
+      .tech-card,
+      .callout {
+        padding: 20px;
+      }
+
+      .hero-metrics {
+        margin-top: 18px;
+      }
+
+      .metric + .metric {
+        margin-top: 12px;
+      }
+
+      .rank-item {
+        grid-template-columns: 1fr;
+      }
+
+      .players-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">F</div>
+        <div class="brand-copy">
+          <strong>FTAP Field Guide</strong>
+          <span>Fling Things And People, cleaned up into one readable UI</span>
+        </div>
+      </div>
 
-<div class="noise-overlay"></div>
-
-<nav>
-  <div class="nav-logo">AI Assistant</div>
-  <div class="nav-status">
-    <div class="dot"></div>
-    <span>CONNECTED</span>
-  </div>
-</nav>
-
-<div class="chat-container">
-  <div class="chat-messages" id="chatMessages">
-    <div class="welcome" id="welcomeBox">
-      <div class="welcome-logo">How can I help you today?</div>
-      <div class="welcome-sub">Ask any question, brainstorm ideas, or just chat with the AI assistant.</div>
+      <nav class="nav-links">
+        <a href="#fundamentals">Fundamentals</a>
+        <a href="#ranks">Ranks</a>
+        <a href="#tech">Tech</a>
+        <a href="#players">Players</a>
+        <a href="#clans">Clans</a>
+      </nav>
     </div>
-  </div>
+  </header>
 
-  <div class="input-area">
-    <div class="input-row">
-      <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
-      <button class="send" id="sendBtn" onclick="sendMessage()">Send</button>
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <article class="hero-card">
+          <div>
+            <div class="eyebrow">Community-sourced FTAP knowledge, rebuilt into a better UI</div>
+            <h1>FTAP, but actually readable.</h1>
+            <p class="hero-copy">
+              This page turns the provided FTAP notes into a cleaner visual guide. It covers the core mechanics,
+              movement logic, anti-grab pressure, rank hierarchy, playstyles, advanced pallet tech, and the players
+              that shaped the meta.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button primary" href="#fundamentals">Start with the basics</a>
+              <a class="button secondary" href="#tech">Jump to advanced tech</a>
+            </div>
+          </div>
+
+          <div class="hero-metrics">
+            <div class="metric">
+              <strong>30 studs</strong>
+              <span>Grab reach and pallet interaction range described in the provided notes.</span>
+            </div>
+            <div class="metric">
+              <strong>Fast / Slow</strong>
+              <span>Most playstyles branch off those two base approaches to fighting.</span>
+            </div>
+            <div class="metric">
+              <strong>User-made movement</strong>
+              <span>FTAP movement depth comes from player techniques, not built-in dashes or hops.</span>
+            </div>
+          </div>
+        </article>
+
+        <aside class="hero-side">
+          <section class="glass-card">
+            <h2>What this guide focuses on</h2>
+            <div class="info-list">
+              <div class="info-item">
+                <strong>How fights actually work</strong>
+                <p>Flinging, ragdolling, timing, distance checks, and why low flings matter against clutch-heavy players.</p>
+              </div>
+              <div class="info-item">
+                <strong>Meta structure</strong>
+                <p>Fast vs slow play, rank expectations, common archetypes, and how higher-level players pressure AG.</p>
+              </div>
+              <div class="info-item">
+                <strong>Advanced pallet tech</strong>
+                <p>Stutter-step, pallet reset, instant grabs, AG bypass attempts, flicking, tapping, and more.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="glass-card">
+            <div class="pill-row">
+              <span class="pill">Source-limited</span>
+              <span class="pill warm">Uses only provided FTAP notes</span>
+            </div>
+            <p style="color: var(--muted); font-size: 0.95rem;">
+              Some player history and certain experimental tech are marked as uncertain in the source material, so this
+              page keeps the wording careful where the notes themselves were unsure.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="fundamentals">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Fundamentals</div>
+            <h2>The core of FTAP</h2>
+          </div>
+          <p>
+            The supplied notes describe FTAP as a player-created movement and combat game where speed, timing, aim,
+            and pallet control matter more than any built-in combat system.
+          </p>
+        </div>
+
+        <div class="grid three">
+          <article class="card">
+            <div class="tag">Core mechanic</div>
+            <h3>Flinging</h3>
+            <p>
+              Flinging is described as a naturally discovered mechanic. You grab the opponent, move them into the floor
+              to ragdoll them, then flick them low enough that they cannot recover cleanly.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="tag">Mechanical pressure</div>
+            <h3>Aiming and timing</h3>
+            <p>
+              The notes frame aiming like an FPS problem, except both players are moving rapidly. Because reach is
+              proximity-based, timing is just as important as raw crosshair placement.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="tag">Movement identity</div>
+            <h3>Pallet control</h3>
+            <p>
+              Movement is built around grabbing the pallet at different heights and scroll distances. More scroll gives
+              speed and less control, while higher grabs and dragging back give more control and lift.
+            </p>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top: 18px;">
+          <article class="card">
+            <div class="pill-row">
+              <span class="pill alert">Anti-grab matters</span>
+            </div>
+            <h3>AG changes fight decisions</h3>
+            <p>
+              AG is a distance check used to stop infinite reach. In the notes it is one of the biggest sources of
+              frustration for PvP players, especially when people move too fast or when dives and dashes back create
+              canceled grabs at the worst possible moment.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="pill-row">
+              <span class="pill warm">Clutching shapes kills</span>
+            </div>
+            <h3>Why low flings and dunks matter</h3>
+            <p>
+              Clutching is presented as one of FTAP's most unfair mechanics because ping heavily affects it. That is
+              why very low flings and dunking are important: they reduce or remove the chance of a recovery.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Playstyles</div>
+            <h2>The fast and slow split</h2>
+          </div>
+          <p>
+            According to the notes, almost every style branches from fast or slow play, with only occasional hybrid
+            players sitting between those two poles.
+          </p>
+        </div>
+
+        <div class="grid three">
+          <article class="card">
+            <h3>Fast archetypes</h3>
+            <ul>
+              <li><strong>High FPS:</strong> extreme speed and control, dive-heavy, widely seen as unfair.</li>
+              <li><strong>Aggressive-fast:</strong> constant rush pressure with straightforward offense.</li>
+              <li><strong>Controlled-fast:</strong> cleaner flow, mid pallet grabbing, adaptable to many moves.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Slow archetypes</h3>
+            <ul>
+              <li><strong>Very slow:</strong> minimal movement, waits for overcommitment, punishes rushes.</li>
+              <li><strong>Hybrid-slow:</strong> converts to slower play when the opponent makes a bad push.</li>
+              <li><strong>Elite slow:</strong> dive-under grabs, AG baiting, and forcing the attacker into bad timing.</li>
+            </ul>
+          </article>
+
+          <article class="callout">
+            <h3>How to pressure a slow player</h3>
+            <p>
+              The notes say you do not beat strong slow players by rushing straight at them. You bait the dive, force
+              the defensive movement, then change your own timing with a stop or dive so you grab during their reset.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ranks">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Rank ladder</div>
+            <h2>How the notes describe FTAP progression</h2>
+          </div>
+          <p>
+            The hierarchy goes from casual all the way to fling god, with the middle and upper tiers becoming more
+            specialized in aim, movement, consistency, and real match impact.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="rank-list">
+            <div class="rank-item">
+              <div>
+                <strong>Casual</strong>
+                <span>Entry level</span>
+              </div>
+              <p>Can fling, barely flies, usually stays near the ground, and generally lacks consistent aim or control.</p>
+            </div>
+
+            <div class="rank-item">
+              <div>
+                <strong>Apprentice</strong>
+                <span>Low / Mid / High</span>
+              </div>
+              <p>Can fly, can grab straightforward opportunities, and may show the first signs of skillful movement.</p>
+            </div>
+
+            <div class="rank-item">
+              <div>
+                <strong>Skillful</strong>
+                <span>Tiers I - III</span>
+              </div>
+              <p>Where players start getting good: stable flying, easy grabs, basic jukes, and much more deliberate movement.</p>
+            </div>
+
+            <div class="rank-item">
+              <div>
+                <strong>Expert</strong>
+                <span>Tiers I - III</span>
+              </div>
+              <p>Usually server standouts with high-level movement or high-level aim, and often enough consistency to swing fights.</p>
+            </div>
+
+            <div class="rank-item">
+              <div>
+                <strong>Advanced</strong>
+                <span>Tiers I - III</span>
+              </div>
+              <p>Very rare. Strong at both aim and movement in most cases, with only a few exceptions or suspected over-ranks.</p>
+            </div>
+
+            <div class="rank-item">
+              <div>
+                <strong>Fling God</strong>
+                <span>Levels, not tiers</span>
+              </div>
+              <p>The rarest status in the notes, reserved for the most notable names in the game's history.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tech">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Advanced tech</div>
+            <h2>Pallet tech and fight manipulation</h2>
+          </div>
+          <p>
+            The second note set focuses on techniques tied to double clicking and the "cool method." These cards keep
+            the ideas readable while preserving the playstyle fit and rough practicality described in the source.
+          </p>
+        </div>
+
+        <div class="tech-grid">
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill">Fast playstyles</span>
+            </div>
+            <h3>Stutter-step</h3>
+            <p>
+              A speed reset that heavily breaks rhythm by abruptly stopping motion in place. The notes frame it as a
+              strong rhythm breaker that pairs well with diving and other fast pressure.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>90% with CM / 60% without</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>80% with CM / 10% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill">Fast playstyles</span>
+            </div>
+            <h3>Pallet resetting</h3>
+            <p>
+              Lets the player switch direction extremely quickly while slightly changing elevation. It is presented as a
+              strong control tool for unpredictable fast movement.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>70% with CM / 20% without</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>80% with CM / 10% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill">Spin / track heavy</span>
+            </div>
+            <h3>Instant grabbing</h3>
+            <p>
+              Crosshair-over-opponent double-click grabs that are described as visually clean and especially deadly when
+              paired with movement that does the aiming for you.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>90% with CM / 20% without</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>100% with CM / 30% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill warm">Slow playstyles</span>
+              <span class="pill alert">Unexplored</span>
+            </div>
+            <h3>AG bypassing</h3>
+            <p>
+              Triple grab attempts designed to beat distance-check failures by giving the grab multiple chances to
+              connect. The notes present it as experimental and not yet broadly practical.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>20% with CM / 0% without</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>40% with CM / 0% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill">Unpredictable styles</span>
+            </div>
+            <h3>Pallet tapping</h3>
+            <p>
+              Early release pressure followed by a delayed or short pallet tap to fake timing. The technique is useful
+              because the exact pause length can vary so much that opponents misread the rush.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>80% with CM / 60% without</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>60% with CM / 20% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill warm">Slow playstyles</span>
+            </div>
+            <h3>Pallet flicking</h3>
+            <p>
+              Flick-based grabs done while never fully letting go of the pallet. The notes describe it as difficult,
+              stylish, and more realistic for slower speeds or smaller flick angles.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>70% on small flicks / 20% on large</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>60% with CM / 0% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill">Fast playstyles</span>
+            </div>
+            <h3>Insta diving</h3>
+            <p>
+              A dive chained into pallet reset to refresh momentum and let the player rush again immediately. The notes
+              present it as a likely core tool for faster high-FPS movement.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>100% with CM / 20% without</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>80% with CM / 10% without</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card">
+            <div class="pill-row">
+              <span class="pill alert">Unconfirmed</span>
+            </div>
+            <h3>Scroll faking</h3>
+            <p>
+              Described as a possible point-of-view desync where the opponent sees a max-scroll state without matching
+              physical movement. The source explicitly marks this as unconfirmed and very inconsistent.
+            </p>
+            <div class="tech-metrics">
+              <div class="tech-metric">
+                <small>Possibility</small>
+                <strong>~10% with CM scroll</strong>
+              </div>
+              <div class="tech-metric">
+                <small>Practicality</small>
+                <strong>High only if it becomes consistent</strong>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid three" style="margin-top: 18px;">
+          <article class="card">
+            <h3>Other named tech in the notes</h3>
+            <ul>
+              <li><strong>Throw resetting:</strong> a weaker reset using the throw mechanic.</li>
+              <li><strong>Stunning:</strong> forces the opponent to re-grab while you pressure them.</li>
+              <li><strong>Player clutching:</strong> body-based clutching while both players are grabbed.</li>
+              <li><strong>Pre-strafing:</strong> leaning into the direction you want before the actual turn.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>What "CM" means here</h3>
+            <p>
+              The uploaded notes define CM as short for "cool method." Several advanced techniques are described as far
+              more practical with CM than without it, especially speed resets and instant grab variants.
+            </p>
+          </article>
+
+          <article class="callout">
+            <h3>Big picture takeaway</h3>
+            <p>
+              Most of the listed tech is not about raw speed alone. It is about rhythm breaking, direction switching,
+              AG manipulation, and forcing the opponent to read the wrong timing.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="players">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Notable players</div>
+            <h2>Players that defined the notes</h2>
+          </div>
+          <p>
+            This is a condensed view of the standout names from the material: former fling gods, meta shapers, and
+            players known for highly specific styles.
+          </p>
+        </div>
+
+        <div class="players-grid">
+          <article class="player-card">
+            <h3>Futurekiddo / pastdoa</h3>
+            <span class="player-meta">Fling God</span>
+            <p>Known for extreme jukes, adaptive style changes, and out-movement that made people try to copy him.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>Spence</h3>
+            <span class="player-meta">Fling God</span>
+            <p>Started as a very fast dive-heavy player, then shifted into a slow aim-heavy style that influenced others.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>LostNPC</h3>
+            <span class="player-meta">Controlled fast</span>
+            <p>Known for consistency, strong aim, and a controlled fast approach centered on clean flow and scroll use.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>Zerogath</h3>
+            <span class="player-meta">Meta shaper</span>
+            <p>Associated with ranking history and the refinement of basic left-right movement into stronger controlled play.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>Rainz</h3>
+            <span class="player-meta">Pallet throwing specialist</span>
+            <p>Known for repeatedly throwing the pallet to move behind opponents in a way the notes call semi unheard of.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>Rupasu</h3>
+            <span class="player-meta">Elite slow</span>
+            <p>Described as one of the best examples of AG baiting, dive-under grabs, and punishing anyone who rushes badly.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>Chamo</h3>
+            <span class="player-meta">Slow style influence</span>
+            <p>Popularized a slower revolution that pushed many higher-rank players away from pure fast pressure.</p>
+          </article>
+
+          <article class="player-card">
+            <h3>Spiritsweat</h3>
+            <span class="player-meta">High FPS specialist</span>
+            <p>Presented as a speed-heavy dive spammer with unmatched pace and controversial script-related accusations.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="clans">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Clans and format</div>
+            <h2>How the scene is organized</h2>
+          </div>
+          <p>
+            The notes describe FTAP PvP as community organized: public fights, private 1v1s, occasional team modes,
+            and clan ecosystems built outside the game itself.
+          </p>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>How people actually play PvP</h3>
+            <ul>
+              <li>There are no official PvP modes in the source notes.</li>
+              <li>Most fights happen in public servers or arranged private sets.</li>
+              <li>1v1s are most common, while 2v2s, 3v3s, and FFAs still happen.</li>
+              <li>The map changes very little, outside occasional event maps.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Clan snapshot</h3>
+            <ul>
+              <li><strong>IVC:</strong> former expert-heavy roster with many big names.</li>
+              <li><strong>GEM:</strong> elite player group gathered around major historical names.</li>
+              <li><strong>TCU:</strong> described negatively, with accusations of cheating and bad ranking.</li>
+              <li><strong>KL / JBL / UE / WDG / AS:</strong> active or legacy community clusters with different standards and reputations.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Built from the FTAP notes you provided, reorganized into a cleaner single-page reference with no chat UI and no old API wiring left behind.
     </div>
-  </div>
-</div>
-
-<script>
-const CONFIG = {
-  endpoint: "https://api.blackbox.ai/v1/chat/completions",
-  model: "blackboxai",
-  apiKey: "sk-proj-S6hK4R8P1mLoG5jY3tW2B9qF7nX5v8c2D1e0Z4r3x7
+  </footer>
+</body>
+</html>
